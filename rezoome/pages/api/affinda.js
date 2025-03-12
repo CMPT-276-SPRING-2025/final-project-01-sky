@@ -1,6 +1,7 @@
+// affinda api handling route
 export default async function handler(req, res) {
     const API_KEY = process.env.AFFINDA_API_KEY;  // Access the API key from the environment variable
-    const apiUrl = 'https://api.affinda.com/';  // Example API URL; replace with actual API endpoint
+    const apiUrl = 'https://api.affinda.com/v3/documents';  // Example API URL; replace with actual API endpoint
   
     try {
       // Example of how to make a GET request with fetch
