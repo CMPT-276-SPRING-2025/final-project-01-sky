@@ -8,6 +8,20 @@ export default function Home() {
         feedback tailored to your target job.
         </p>
       </header>
+
+      <main className="container mx-auto px-4">
+        <section className="mb-10">
+          <h2 className="text-2xl font-semibold text-black mb-4">
+            Mock Interview      
+          </h2>
+
+        </section>
+      </main>
+
+
+
+
+
     </div>
   );
 }
