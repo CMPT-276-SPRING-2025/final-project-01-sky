@@ -5,7 +5,7 @@ import ReasonCard from "../components/ReasonCard";
 export default function Home() {
   return (
     // Title and Description
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-10">
       <header className="text-center p-10">
         <h1 className="text-5xl font-bold text-black">ReZoomé</h1>
         <p className=" text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
@@ -15,7 +15,7 @@ export default function Home() {
       </header>
 
       {/* Cards Section */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10 pb-70">
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10 pb-50">
         {/* Mock Interview Card */}
         <ButtonCard
           title="Mock Interview"
