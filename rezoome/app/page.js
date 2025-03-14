@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ButtonCard from "../components/ButtonCard";
+import ReasonCard from "../components/ReasonCard";
 
 export default function Home() {
   return (
@@ -12,43 +14,25 @@ export default function Home() {
         </p>
       </header>
 
-      {/* Mock Interview Card */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8 min-h-screen bg-[var(--background)] p-8 mt-0">
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden max-w-[474px]">
-          <img src="/mock-interview.jpg" alt="Mock Interview" className="w-full h-64 object-cover" />
-          <div className="p-10 flex flex-col h-64">
-            <h2 className="text-2xl font-bold mb-2 pt-4">Mock Interview</h2>
-            <p className="text-base text-[var(--text-colour)] mb-4">
-              Practice with realistic interview questions tailored to your target job.
-            </p>
-            <div className="mt-auto">
-              <Link href="/mock-interview">
-                <button className="w-full bg-[var(--button-colour)] text-white py-2 rounded-lg hover:bg-blue-600 transition">
-                Begin Now
-                </button>
-              </Link>
-          </div>
-          </div>
-        </div>
+      {/* Cards Section */}
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10">
+        {/* Mock Interview Card */}
+        <ButtonCard
+          title="Mock Interview"
+          description="Practice with realistic interview questions tailored to your target job."
+          imageSrc="/mock-interview.jpg"
+          link="/mock-interview"
+        />
 
-        {/* Resume Review Card  */}
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden max-w-[474px]">
-          <img src="/resume-review.jpg" alt="Resume Review" className="w-full h-64 object-cover" />
-          <div className="p-10 flex flex-col h-64">
-            <h2 className="text-2xl font-bold mb-2 pt-4">Resume Review</h2>
-            <p className="text-base text-[var(--text-colour)] mb-4">
-              Get expert feedback to make your resume stand out to employers.
-            </p>
-            <div className="mt-auto">
-              <Link href="/resume-review">
-                <button className="w-full bg-[var(--button-colour)] text-white py-2 rounded-lg hover:bg-blue-600 transition">
-                Begin Now
-                </button>
-              </Link>
-          </div>
-          </div>
-        </div>
+        {/* Resume Review Card */}
+        <ButtonCard
+          title="Resume Review"
+          description="Get expert feedback to make your resume stand out to employers."
+          imageSrc="/resume-review.jpg"
+          link="/resume-review"
+        />
       </main>
+
 
       {/* Reason Section */}
       <section className="bg-[var(--secondary-colour)] py-30">
@@ -59,39 +43,25 @@ export default function Home() {
         </p>
         </header>
 
-        <main className="flex flex-wrap justify-center items-center gap-8 mt-8">
-        {/* Reason Card 1 */}
-        <div className="bg-white shadow-lg rounded-lg w-[303.33px] h-[295.27px] flex flex-col p-4">
-          <img src="/mock-interview.jpg" alt="Mock Interview" className="w-full h-48 object-cover rounded-lg" />
-          <div className="flex flex-col justify-between mt-4">
-            <h2 className="text-xl font-semibold">Reason #1</h2>
-            <p className="text-base text-[var(--text-colour)] mt-2">
-              lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-        </div>
+        {/* Reason Cards Section */}
+      <main className="flex flex-wrap justify-center items-center gap-8 mt-8">
+        <ReasonCard
+          title="Reason #1"
+          imageSrc="/mock-interview.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
 
-        {/* Reason Card 2 */}
-        <div className="bg-white shadow-lg rounded-lg w-[303.33px] h-[295.27px] flex flex-col p-4">
-          <img src="/resume-review.jpg" alt="Resume Review" className="w-full h-48 object-cover rounded-lg" />
-          <div className="flex flex-col justify-between mt-4">
-            <h2 className="text-xl font-semibold">Reason #2</h2>
-            <p className="text-base text-[var(--text-colour)] mt-2">
-              lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-        </div>
+        <ReasonCard
+          title="Reason #2"
+          imageSrc="/resume-review.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
 
-        {/* Reason Card 3 */}
-        <div className="bg-white shadow-lg rounded-lg w-[303.33px] h-[295.27px] flex flex-col p-4">
-          <img src="/career-coaching.jpg" alt="Career Coaching" className="w-full h-48 object-cover rounded-lg" />
-          <div className="flex flex-col justify-between mt-4">
-            <h2 className="text-xl font-semibold">Reason #3</h2>
-            <p className="text-base text-[var(--text-colour)] mt-2">
-              lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-        </div>
+        <ReasonCard
+          title="Reason #3"
+          imageSrc="/career-coaching.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
       </main>
 
       </section>
