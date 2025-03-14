@@ -15,7 +15,7 @@ export default function Home() {
       </header>
 
       {/* Cards Section */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10">
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10 pb-70">
         {/* Mock Interview Card */}
         <ButtonCard
           title="Mock Interview"
