@@ -1,7 +1,9 @@
 import Link from "next/link";
+import ProgressBar from "../components/ProgressBar";
 import '../app/globals.css';
 
 export default function ResumeReview() {
+  const steps = ['Upload Resume', 'Analyze Resume', 'Generate Questions', 'Complete'];
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans p-10">
       <div className="text-center p-10">
@@ -10,6 +12,12 @@ export default function ResumeReview() {
           lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </div>
+
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-8">
+        
+      </main>
+
     </div>
+    
   );
 }
