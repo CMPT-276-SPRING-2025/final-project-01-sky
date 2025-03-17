@@ -26,8 +26,6 @@ const Header = () => {
           Resume Review
         </Link>
       </nav>
-
-      
     </header>
   );
 };
