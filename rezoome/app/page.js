@@ -1,101 +1,70 @@
-import Image from "next/image";
+import Link from "next/link";
+import ButtonCard from "../components/ButtonCard";
+import ReasonCard from "../components/ReasonCard";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    // Title and Description
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-10">
+      <header className="text-center p-10">
+        <h1 className="text-5xl font-bold text-black">ReZoomé</h1>
+        <p className=" text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
+        AI-powered mock interview and resume review platform with real-time practice and 
+        feedback tailored to your target job.
+        </p>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      {/* Cards Section */}
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10 pb-50">
+        {/* Mock Interview Card */}
+        <ButtonCard
+          title="Mock Interview"
+          description="Practice with realistic interview questions tailored to your target job."
+          imageSrc="/mock-interview.jpg"
+          link="/mock-interview"
+        />
+
+        {/* Resume Review Card */}
+        <ButtonCard
+          title="Resume Review"
+          description="Get expert feedback to make your resume stand out to employers."
+          imageSrc="/resume-review.jpg"
+          link="/resume-review"
+        />
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+
+      {/* Reason Section */}
+      <section className="bg-[var(--secondary-colour)] py-30">
+        <header className="text-center py-10">
+        <h2 className="text-4xl font-bold text-black">Why Choose ReZoomé</h2>
+        <p className=" text-[var(--text-colour)] mt-4 max-w-3xl mx-auto">
+        lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </p>
+        </header>
+
+        {/* Reason Cards Section */}
+      <main className="flex flex-wrap justify-center items-center gap-8 mt-8">
+        <ReasonCard
+          title="Reason #1"
+          imageSrc="/mock-interview.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
+
+        <ReasonCard
+          title="Reason #2"
+          imageSrc="/resume-review.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
+
+        <ReasonCard
+          title="Reason #3"
+          imageSrc="/career-coaching.jpg"
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        />
+      </main>
+
+      </section>
     </div>
   );
 }
