@@ -11,6 +11,7 @@ export default function Home() {
       {/* Header Component */}
       <Header />
       <header className="text-center p-30">
+
         <h1 className="text-5xl font-bold text-black">ReZoomé</h1>
         <p className=" text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
         AI-powered mock interview and resume review platform with real-time practice and 
