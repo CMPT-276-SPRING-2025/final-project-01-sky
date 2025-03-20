@@ -6,6 +6,8 @@ import ProgressBar from "../../components/ProgressBar";
 import FileUpload from "../../components/FileUpload";
 import '../globals.css';
 
+import Button from "@/components/Button";
+
 export default function ResumeReview() {
   const steps = ['Upload Resume', 'Add Job', 'View Results'];
   const [currentStep, setCurrentStep] = useState(0); // Initialize at the first step
@@ -21,19 +23,27 @@ export default function ResumeReview() {
       <div className="text-center p-20">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-          lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Get expert feedback to make your resume stand out to employers.
         </p>
       </div>
 
       {/* Upload File Section */}
       <section className="bg-[var(--secondary-colour)] pb-30">
         <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-50">
+        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
           <div className="flex justify-center w-full mt-8">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>
         </main>
+
+        
+        
+        
         </div> 
+        <div className="flex justify-between mx-70">
+          <Button color="grey" href="/" >Go Home</Button>
+          <Button color="black" href="/resume-review-2">Next</Button>
+          </div>
       </section>
 
     </div>
