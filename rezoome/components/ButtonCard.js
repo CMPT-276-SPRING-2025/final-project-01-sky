@@ -10,7 +10,7 @@ export default function ButtonCard({ title, description, image, link }) {
         <p className="text-base text-[var(--text-colour)] mb-4">{description}</p>
         <div className="mt-auto">
           <Link href={link}>
-            <button className="w-full bg-[var(--button-colour)] text-white py-2 rounded-lg hover:bg-[var(--second-button-colour)] transition">
+            <button className="w-full bg-[var(--button-colour)] text-white py-2 rounded-lg hover:bg-[var(--second-button-colour)] transition hover:cursor-pointer">
               Begin Now
             </button>
           </Link>
