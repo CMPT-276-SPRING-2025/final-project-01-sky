@@ -10,8 +10,42 @@ export default function ResumeReview() {
 
   const handleFileSelect = (file) => {
     console.log("File selected:", file);
+    uploadFile(file)
     // Handle the selected file
   };
+
+  async function uploadFile(file) {
+    try {
+        const base64File = await fileToBase64(file); // Convert file to Base64
+
+        const response = await fetch("/api/affinda", { // ✅ Call the API route
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ file: base64File }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        console.log("Affinda API Response:", data);
+        return data;
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        return { error: error.message };
+    }
+}
+
+// Utility function to convert file to Base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Extract base64 part
+        reader.onerror = (error) => reject(error);
+    });
+}
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
