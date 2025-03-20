@@ -4,7 +4,7 @@ const Footer = () => {
     return (
       <footer className="bg-[var(--footer-colour)] text-white text-center py-4">
         <div className="container mx-auto flex flex-col items-center justify-center px-6">
-          <div className="grid grid-cols-3 pl-20 gap-4 p-6 w-full">
+          <div className="grid grid-cols-3 pl-30 gap-4 p-6 w-full">
             <div className="text-white p-6">
               <p className='font-bold text-left'>About Us</p>
               <p className='text-left'>We are 4 Computing Science student developers at Simon Fraser University.</p>

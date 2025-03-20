@@ -27,7 +27,7 @@ export default function Home() {
           altText="This image is a snippet of the Mock Interview feature on step 3, where you can read your feedback and suggestions based on your interview performance."
           description="Practice with realistic interview questions tailored to your target job."
           imageSrc="/mock-interview.jpg"
-          link="/mock-interview"
+          link="/mock-interview-1"
         />
 
         {/* Resume Review Card */}
@@ -36,7 +36,7 @@ export default function Home() {
           altText="This image is a snippet of the Resume Review feature on step 3, where you have your uploaded resume on the left and your feedback and suggestions on the right."
           description="Get expert feedback to make your resume stand out to employers."
           imageSrc="/resume-review.jpg"
-          link="/resume-review"
+          link="/resume-review-1"
         />
       </main>
 
