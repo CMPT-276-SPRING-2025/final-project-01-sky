@@ -10,7 +10,7 @@ export default function Home() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       {/* Header Component */}
       <Header />
-      <header className="text-center p-30">
+      <header className="text-center p-10">
 
         <h1 className="text-5xl font-bold text-black">ReZoomé</h1>
         <p className=" text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
@@ -20,7 +20,7 @@ export default function Home() {
       </header>
 
       {/* Cards Section */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 p-10 pb-50">
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8  pb-50">
         {/* Mock Interview Card */}
         <ButtonCard
           title="Mock Interview"

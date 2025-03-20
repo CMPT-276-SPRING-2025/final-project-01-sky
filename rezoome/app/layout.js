@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Rezoomé",
-  description: "AI-powered interview preparation tool",
+  title: "ReZoomé",
+  description: "AI-powered mock interview and resume review platform with real-time practice and feedback tailored to your target job",
 };
 
 export default function RootLayout({ children }) {
