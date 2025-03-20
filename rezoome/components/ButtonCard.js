@@ -1,10 +1,10 @@
 // components for cards with buttons
 import Link from "next/link";
 
-export default function ButtonCard({ title, description, image, link }) {
+export default function ButtonCard({ title, altText, description, image, link }) {
   return (
     <div className="bg-white shadow-lg rounded-xl overflow-hidden max-w-[474px] max-h-[394px] w-full flex flex-col">
-      <img src={image} alt={title} className="w-full h-64 object-cover" />
+      <img src={image} alt={altText} className="w-full h-64 object-cover" />
       <div className="p-10 flex flex-col h-64">
         <h2 className="text-2xl font-bold mb-2 pt-4">{title}</h2>
         <p className="text-base text-[var(--text-colour)] mb-4">{description}</p>

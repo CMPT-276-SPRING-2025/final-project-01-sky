@@ -9,7 +9,7 @@ const Header = () => {
       {/* Left side - Logo */}
       <Link href="/" className="flex items-center space-x-4">
         {/* Replace with your logo image */}
-        <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
+        <img src="/favicon.ico" alt="This is the ReZoomé logo, which is a dark green circle with a light green capital R overlayed on top." className="w-8 h-8" />
         <span className="text-lg font-semibold text-gray-800 hover:text-gray-900 border-b-1 border-transparent hover:border-gray-900 transition">ReZoomé</span>
       </Link>
 
