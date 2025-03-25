@@ -1,5 +1,4 @@
 # Mock Interview Simulation
-*Group Members: Cole McKee, Colton Chan, Gia Han Pham, Mara Liwayway David <br>*
 
 ### Project Description
 Our project will be a **mock interview simulation** and **resume review** that uses **AI** to generate **realistic interview questions** and give **feedback** on the resume and interview question answers. 
