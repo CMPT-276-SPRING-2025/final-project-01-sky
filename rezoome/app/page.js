@@ -55,21 +55,21 @@ export default function Home() {
         <ReasonCard
           title="Confidence Building"
           altText="This image for the first reason why you should use ReZoomé displays an dark green icon of a confident, happy person with a smile."
-          imageSrc="/mock-interview.jpg"
+          imageSrc="/happy.png"
           description="Provides repeated practice to boost confidence in interview settings."
         />
 
         <ReasonCard
           title="Tailored Feedback"
           altText="This image for the second reason why you should use ReZoomé displays an dark green icon of a line with an overall positive graph trend."
-          imageSrc="/resume-review.jpg"
+          imageSrc="/bar-chart.png"
           description="Live audio and visual recordings mimic real interview scenarios."
         />
 
         <ReasonCard
           title="Realistic Simulation"
           altText="This image for the third reason why you should use ReZoomé displays an dark green icon of a pencil and paper beside each other, where the paper has a list of items with some checkmarks marked."
-          imageSrc="/career-coaching.jpg"
+          imageSrc="/document.png"
           description="Customized questions and feedback based on the user's resume."
         />
       </main>
