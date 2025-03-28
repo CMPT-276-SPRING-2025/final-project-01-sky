@@ -4,6 +4,7 @@ const FileUpload = ({ onFileSelect }) => {
   const fileInputRef = useRef(null);
 
   const handleClick = () => {
+    e.stopPropagation();
     fileInputRef.current.click();
   };
 
