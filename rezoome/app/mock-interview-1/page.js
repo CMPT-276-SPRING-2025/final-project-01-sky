@@ -8,12 +8,23 @@ import Button from "@/components/Button";
 
 export default function ResumeReview() {
 
-  const handleFileSelect = (file) => {
+  const handleFileSelect = async (file) => {
     console.log("File selected:", file);
-    uploadFile(file)
     // Handle the selected file
+    const rawData = await uploadFile(file)
+    if(rawData.success === true){
+      const resumeData = rawData.data.data
+      console.log("Interperting data")
+      const formattedData = interpretData(resumeData)
+      console.log("Here is the formatted data:")
+      console.log(formattedData)
+    }
+    else{
+      console.log("Data is not readable")
+    }
   };
 
+  //Takes in the file object and runs it to the Affinda API returns JSON
   async function uploadFile(file) {
     try {
         const base64File = await fileToBase64(file); // Convert file to Base64
@@ -30,6 +41,7 @@ export default function ResumeReview() {
 
         const data = await response.json();
         console.log("Affinda API Response:", data);
+        //console.log("first name:" + data.data.data.candidateName.raw)
         return data;
     } catch (error) {
         console.error("Error uploading file:", error);
@@ -45,6 +57,53 @@ function fileToBase64(file) {
         reader.onload = () => resolve(reader.result.split(',')[1]); // Extract base64 part
         reader.onerror = (error) => reject(error);
     });
+}
+
+//Takes in the raw data JSON and returns it formatted
+function interpretData(data){
+  const jsonOutput = {
+    name: [
+      data?.candidateName?.parsed?.candidateNameFirst?.parsed,
+      data?.candidateName?.parsed?.candidateNameMiddle?.parsed,
+      data?.candidateName?.parsed?.candidateNameFamily?.parsed,
+    ]
+      .filter(Boolean)
+      .join(" "),
+    
+    age: data?.dateOfBirth?.parsed?.age ?? null, 
+
+    education: data?.education?.map((edu) => ({
+      institution: edu.parsed?.educationOrganization?.parsed,
+      degree: edu.parsed?.educationAccreditation?.parsed,
+      major: edu.parsed?.educationMajor?.map((m) => m.parsed).join(", "),
+      date: edu.parsed?.educationDateRange?.parsed?.end?.year,
+      location: edu.parsed?.educationLocation?.parsed?.formatted,
+    })) ?? [],
+
+    workExperience: data?.workExperience?.map((job) => ({
+      jobTitle: job.parsed?.jobTitle?.parsed,
+      company: job.parsed?.workExperienceOrganization?.parsed,
+      location: job.parsed?.workExperienceLocation?.parsed?.formatted,
+      startDate: job.parsed?.workExperienceDateRange?.parsed?.start?.year,
+      endDate: job.parsed?.workExperienceDateRange?.parsed?.end?.year,
+      description: job.parsed?.jobDescription?.parsed
+    })) ?? [],
+
+    skills: data?.skill?.map((skill) => skill.parsed?.name) ?? [],
+
+    //projects: data?.project?.map((proj) => proj.parsed?.name) ?? [],
+    projects: data?.project?.map((proj) => ({
+      projectTitle: proj.parsed?.projectTitle?.parsed,
+      description: proj.parsed?.projectDescription?.parsed
+    })) ?? [],
+
+    acheivements: data?.achievement?.map((item) => item.parsed) ?? [],
+
+    associations: data?.association?.map(a => a.parsed || a.raw) ?? [],
+    hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
+    patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
+  };
+  return(jsonOutput)
 }
 
   return (
