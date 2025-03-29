@@ -1,9 +1,14 @@
+
+
 import { POST } from "../app/api/affinda/route"; // Adjust the path as needed
+
+
+
 import { NextResponse } from "next/server";
 
 // Mocking fetch
 global.fetch = jest.fn();
-
+process.env.AFFINDA_API_KEY = "test-key";
 describe("Affinda API File Upload", () => {
     beforeEach(() => {
         fetch.mockClear();
@@ -12,10 +17,10 @@ describe("Affinda API File Upload", () => {
     it("should return 400 if no file is provided", async () => {
         const req = { json: jest.fn().mockResolvedValue({}) };
         const response = await POST(req);
+        const jsonResponse = await response.json();
 
-        expect(response).toEqual(
-            NextResponse.json({ error: "No file provided" }, { status: 400 })
-        );
+        expect(jsonResponse).toEqual({ error: "No file provided" });
+        expect(response.status).toBe(400); // Added status check
     });
 
     it("should successfully process a file and return data", async () => {
@@ -40,6 +45,7 @@ describe("Affinda API File Upload", () => {
 
         expect(fetch).toHaveBeenCalledTimes(2);
         expect(jsonResponse).toEqual({ success: true, data: mockResumeData });
+        expect(response.status).toBe(200); // 🔥 [FIX] Added status check
     });
 
     it("should return 500 if Affinda API fails", async () => {
@@ -57,5 +63,7 @@ describe("Affinda API File Upload", () => {
 
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(jsonResponse.error).toBe("Internal Server Error");
+        expect(response.status).toBe(500); // 🔥 [FIX] Added status check
     });
+    
 });
