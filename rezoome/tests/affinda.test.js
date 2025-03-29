@@ -49,6 +49,7 @@ describe("Affinda API File Upload", () => {
     });
 
     it("should return 500 if Affinda API fails", async () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         const mockFile = "mockBase64FileString";
 
         fetch.mockResolvedValueOnce({
@@ -64,6 +65,8 @@ describe("Affinda API File Upload", () => {
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(jsonResponse.error).toBe("Internal Server Error");
         expect(response.status).toBe(500); // 🔥 [FIX] Added status check
+
+        consoleErrorSpy.mockRestore();
     });
     
 });
