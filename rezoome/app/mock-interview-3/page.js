@@ -1,29 +1,62 @@
 "use client"; {/* Error popups if this is not here */}
-import React, { useState } from 'react'; // Add the useState import
+import { useState, useRef, useEffect } from "react"; // Add the useState import
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
 
-export default function ResumeReview() {
+export default function InterviewPage() {
+  const [isRecording, setIsRecording] = useState(false);
+  const videoRef = useRef(null);
 
-  
+  useEffect(() => {
+    // Access the user's camera
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch((err) => console.error("Error accessing media:", err));
+  }, []);
+
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
-     
 
-      {/* Text input section */}
-      <section className="bg-[var(--secondary-colour)] pb-30">
-
-      <div className="flex justify-between mx-60">
-          <Button color="grey" href="/mock-interview-2">Go Back</Button>
-          <Button color="black" href="/mock-interview-4">Next</Button>
+      {/* Question Box */}
+      <section className="bg-[var(--secondary-colour)] py-6 text-center w-full">
+        <div className="w-full max-w-2xl mx-auto bg-white p-4 rounded-xl shadow-md">
+          <p className="text-gray-500 text-sm">Question 1</p>
+          <h2 className="text-lg font-semibold mt-1">Tell me about yourself.</h2>
+          <p className="text-gray-400 text-sm mt-1">1/4</p>
         </div>
-
       </section>
 
+      {/* Video + Recording Section */}
+      <section className="flex flex-col items-center justify-center mt-8">
+        <div className=" w-full max-w-[980px] h-[496px] bg-gray-300 rounded-xl relative overflow-hidden">
+          <video ref={videoRef} autoPlay playsInline className="absolute w-full h-full object-cover" />
+        </div>
+
+        {/* Record Button */}
+        <button
+          className={`w-12 h-12 mt-4 rounded-full ${
+            isRecording ? "bg-red-600" : "bg-red-500"
+          }`}
+          onClick={toggleRecording}
+        ></button>
+      </section>
+
+      {/* Navigation Buttons */}
+      <section className="flex justify-between mx-70 px-8">
+        <Button color="grey" href="/mock-interview-2">Go Back</Button>
+        <Button color="black" href="/mock-interview-4">Next</Button>
+      </section>
     </div>
-    
   );
 }
