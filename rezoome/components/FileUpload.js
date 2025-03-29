@@ -4,7 +4,9 @@ const FileUpload = ({ onFileSelect }) => {
   const fileInputRef = useRef(null);
 
   const handleClick = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const handleFileChange = (e) => {
@@ -23,14 +25,18 @@ const FileUpload = ({ onFileSelect }) => {
         ref={fileInputRef}
         type="file"
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        onClick={(e) => e.stopPropagation()} 
         onChange={handleFileChange}
         accept=".pdf, .docx"
       />
-      <div className="text-center mt-6">
+      <div className="text-center ">
         <img
-          src="/your-image-placeholder.png"
+          src="/upload.png"
+          width={60}
+          height={60}
+          
           alt="Upload"
-          className="mb-4"
+          className="mb-4 block mx-auto"
         />
         <p className="font-bold text-black text-lg">Drag & drop your resume here</p>
         <p className="text-gray-500 text-sm">or click to browse files</p>
