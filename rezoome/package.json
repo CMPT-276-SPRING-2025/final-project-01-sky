@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test": "jest --silent"
+
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.10.1",
