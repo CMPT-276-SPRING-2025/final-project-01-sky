@@ -46,8 +46,8 @@ export default function ResumeReview() {
         
         </div> 
         <div className="flex justify-between mx-70">
-          <Button color="grey" href="/" >Go Home</Button>
-          <Button color="black" href="/resume-review-2">Next</Button>
+          <Button color="grey" href="/resume-review-1" >Go Back</Button>
+          <Button color="black" href="/resume-review-3">Next</Button>
           </div>
       </section>
 
