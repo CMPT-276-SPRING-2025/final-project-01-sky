@@ -5,7 +5,9 @@ import '../globals.css';
 import Button from '@/components/Button';
 
 export default function InterviewPage() {
+  // State to manage recording status
   const [isRecording, setIsRecording] = useState(false);
+  // ref to access the video element
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -13,13 +15,16 @@ export default function InterviewPage() {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
+        // Set the video source to the stream
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       })
-      .catch((err) => console.error("Error accessing media:", err));
-  }, []);
+      .catch((err) => console.error("Error accessing media:", err)); //Log errors
+  }, []); // This effect runs once when the component mounts
 
+  // Function to toggle recording state
+  // This function will start or stop the recording based on the current state
   const toggleRecording = () => {
     setIsRecording(!isRecording);
   };
