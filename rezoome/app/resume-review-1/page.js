@@ -23,7 +23,7 @@ export default function ResumeReview() {
       console.log("Here is the formatted data:")
       console.log(formattedData)
       try {
-        const response = await fetch('/api/openai', {
+        const response = await fetch('/api/openai-resume-review', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
