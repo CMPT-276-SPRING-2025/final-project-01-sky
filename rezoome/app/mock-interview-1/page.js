@@ -7,10 +7,15 @@ import '../globals.css';
 import Button from "@/components/Button";
 
 export default function ResumeReview() {
+  const [fileUploaded, setFileUploaded] = useState(false); // track file upload state; initially set it to false
+
 
   const handleFileSelect = async (file) => {
     console.log("File selected:", file);
-    // Handle the selected file
+    setFileUploaded(true); // set the file upload to true once there is one uploaded
+    
+    
+    // handle the selected file
     const rawData = await uploadFile(file)
     if(rawData.success === true){
       const resumeData = rawData.data.data
@@ -129,7 +134,22 @@ function interpretData(data){
         </main>
         <div className="flex justify-between mx-60">
           <Button color="grey" href="/" >Go Home</Button>
-          <Button color="black" href="/mock-interview-2">Next</Button>
+          <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (fileUploaded) {
+                    window.location.href = "/mock-interview-2";
+                  }
+                }}
+                className={`rounded-lg px-4 py-2 inline-block transition ${
+                  fileUploaded
+                    ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
+                    : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+                }`}
+                disabled={!fileUploaded}
+              >
+                Next
+          </button>
           </div>
         
         </div> 
