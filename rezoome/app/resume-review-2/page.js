@@ -8,6 +8,7 @@ export default function ResumeReview() {
   const [text, setText] = useState(""); 
   function handleSubmit(){
     console.log("user typed:", text)
+    localStorage.setItem("mockInterviewInput", text); // store this in local storage
   }
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -21,34 +22,34 @@ export default function ResumeReview() {
 
       {/* Text input section */}
       <section className="bg-[var(--secondary-colour)] pb-30">
-        <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
-          <div className="flex justify-center w-full mt-8">
-            <div className="w-[980px] h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
-                <textarea 
-                    placeholder="Start typing here..." 
-                    value={text} 
-                    onChange={(e) => setText(e.target.value)}
-                    className="w-full h-full p-2 border rounded resize-none"
-                />
-                <button 
-                    onClick={() => handleSubmit(text)}
-                    className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                    Submit
-                </button>
-            </div>
-          </div>
-        </main>
-
-        
-        
-        
-        </div> 
-        <div className="flex justify-between mx-70">
-          <Button color="grey" href="/resume-review-1" >Go Back</Button>
-          <Button color="black" href="/resume-review-3">Next</Button>
-          </div>
+              <div className="text-center p-5">
+              <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
+                <div className="flex justify-center w-full mt-8">
+                  <div className="w-[980px] h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
+                      <textarea 
+                          placeholder="Enter the target job listing here..." 
+                          value={text} 
+                          onChange={(e) => setText(e.target.value)}
+                          className="w-full h-full p-5 border border-gray-300 rounded resize-none"
+                      />
+                  </div>
+                </div>
+              </main>
+      
+              </div> 
+              <div className="flex justify-between mx-70">
+                <Button color="grey" href="/resume-review-1" >Go Back</Button>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault(); // prevent immediate navigation to the mock interview page
+                    handleSubmit(); // log the input value
+                    window.location.href = "/resume-review-3" // after logging the value, navigate to this page
+                  }}
+                  color="black">
+                  
+                  Next
+                </Button>
+                </div>
       </section>
 
     </div>
