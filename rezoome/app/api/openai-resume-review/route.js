@@ -21,7 +21,7 @@ export async function POST(req) {
   }
 }
 
-export async function POST2(req) {
+export async function PUT(req) {
   try {
     const body = await req.json(); // Parse incoming JSON
     console.log("Received listing data:", body);
