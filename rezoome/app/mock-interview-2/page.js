@@ -43,7 +43,7 @@ export default function ResumeReview() {
                   onClick={(e) => {
                     e.preventDefault();
                     handleSubmit();
-                    window.location.href = "/resume-review-3";
+                    window.location.href = "/mock-interview-3";
                   }}
                   className={`rounded-lg px-4 py-2 inline-block transition ${
                     text
