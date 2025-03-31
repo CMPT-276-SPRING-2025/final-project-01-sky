@@ -135,13 +135,12 @@ function interpretData(data){
       </div>
 
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-20">
+      <section className="bg-[var(--secondary-colour)] pb-45">
         <div className="text-center p-5">
         <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-10">
           <div className="flex justify-center w-full mt-8">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>
-
           
 
         </main>
