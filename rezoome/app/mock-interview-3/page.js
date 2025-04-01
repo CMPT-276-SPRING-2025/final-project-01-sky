@@ -5,7 +5,8 @@ import '../globals.css';
 import Button from '@/components/Button';
 
 let currQuestion = 0;
-let questionList
+let questionList;
+let hasFetched = false;
 
 export default function InterviewPage() {
   // State to manage recording status
@@ -27,26 +28,31 @@ export default function InterviewPage() {
   }, []); // This effect runs once when the component mounts
 
   useEffect( () => {
+    
     // Fetch interview questions from the API
     async function fetchQuestions() {
-      try {
-        const response = await fetch("/api/openai-mock-interview");
-        if (!response.ok) {
-          const text = await response.text(); // fallback for non-JSON error bodies
-          throw new Error(`Fetch failed: ${text}`);
+      if(hasFetched !== true){
+        hasFetched = true
+        try {
+          const response = await fetch("/api/openai-mock-interview");
+          if (!response.ok) {
+            const text = await response.text(); // fallback for non-JSON error bodies
+            throw new Error(`Fetch failed: ${text}`);
+          }
+          const data = await response.json();
+          console.log("Interview questions:", data.questions);
+    
+          const questionsArr = data.questions.split('|');
+          const questionElement = document.getElementById("questionText");
+          if (questionElement && questionsArr.length > 0) {
+            questionElement.textContent = questionsArr[0].trim();
+          }
+          questionList = questionsArr
+        } catch (error) {
+          console.error("Error fetching questions:", error);
         }
-        const data = await response.json();
-        console.log("Interview questions:", data.questions);
-  
-        const questionsArr = data.questions.split('|');
-        const questionElement = document.getElementById("questionText");
-        if (questionElement && questionsArr.length > 0) {
-          questionElement.textContent = questionsArr[0].trim();
-        }
-        questionList = questionsArr
-      } catch (error) {
-        console.error("Error fetching questions:", error);
       }
+
     }
 
   
@@ -58,8 +64,8 @@ export default function InterviewPage() {
   function nextQuestion(){
     currQuestion = (currQuestion + 1) % 4;
     document.getElementById("questionText").textContent = questionList[currQuestion].trim();
-    document.getElementById("questionNumber").textContent = "Question " + currQuestion + 1;
-    document.getElementById("questionFraction").textContent = currQuestion + 1 + "/4";
+    document.getElementById("questionNumber").textContent = "Question " + (currQuestion + 1);
+    document.getElementById("questionFraction").textContent = (currQuestion + 1) + "/4";
   }
 
   // Function to toggle recording state

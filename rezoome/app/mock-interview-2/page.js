@@ -58,9 +58,9 @@ export default function ResumeReview() {
               <div className="flex justify-between mx-70">
                 <Button color="grey" href="/mock-interview-1" >Go Back</Button>
                 <button
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault();
-                    handleSubmit();
+                    await handleSubmit();
                     window.location.href = "/mock-interview-3";
                   }}
                   className={`rounded-lg px-4 py-2 inline-block transition ${
