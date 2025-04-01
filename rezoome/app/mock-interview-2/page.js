@@ -23,8 +23,7 @@ export default function ResumeReview() {
         }
     
         const result = await response.json();
-        console.log("OpenAI Response:", result);
-        // optionally show it in the UI
+        console.log("Server Response:", result);
       } catch (error) {
         console.error("Error calling OpenAI route:", error);
       }

@@ -2,6 +2,8 @@
 import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
+
+
 let resumeData = ""
 let listingData = ""
 
@@ -38,6 +40,7 @@ export async function PUT(req) {
 }
 
 export async function GET(req) {
+  const apiKey = process.env.OPENAI_API_KEY;
   try {
     if (!resumeData || !listingData) {
       return new NextResponse("Missing resume or listing data", { status: 400 });
@@ -52,16 +55,29 @@ ${JSON.stringify(resumeData, null, 2)}
 Here is the job listing:
 ${JSON.stringify(listingData, null, 2)}
 
-Based on the resume and job description, generate a list of 5 tailored technical and behavioral interview questions to help them prepare.
+Based on the resume and job description, generate a list of technical and behavioral interview questions to help them prepare tailored to their job listing and resume. This list should have exactly 4 questions total. Do not number the questions. Only respond with the questions and seperate each with |
 `;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const responseText = completion.choices[0].message.content;
+    const response = await fetch("https://api.openai.com/v1/chat/completions", 
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini", 
+          messages: [
+              { role: "system", content: "You are an interviewer making questions for a potential hire" },
+              { role: "user", content: prompt }
+          ],
+          max_tokens: 500
+        })
+      }
+    )
+    const json = await response.json();
+    const responseText = json.choices[0].message.content;
     return NextResponse.json({ questions: responseText });
+
   } catch (error) {
     console.error("Error generating interview questions:", error);
     return new NextResponse("Failed to generate questions", { status: 500 });

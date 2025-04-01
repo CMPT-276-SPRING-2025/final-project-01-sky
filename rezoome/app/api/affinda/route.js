@@ -38,7 +38,7 @@ async function parseResumeWithAffinda(base64File) {
           },
           body: JSON.stringify({
               file: base64File,  // Sending the Base64 file
-              collection: "tWjKYFPQ", // Optional: replace with your Affinda collection ID
+              collection: "DbKdQIFn", // Optional: replace with your Affinda collection ID
               wait_for_review: false // 🔥 Ensures instant processing
           }),
       });
