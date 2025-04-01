@@ -55,7 +55,7 @@ ${JSON.stringify(resumeData, null, 2)}
 Here is the job listing:
 ${JSON.stringify(listingData, null, 2)}
 
-Based on the resume and job description, generate a list of technical and behavioral interview questions to help them prepare tailored to their job listing and resume. This list should have exactly 4 questions total. Do not number the questions. Only respond with the questions and seperate each with |
+Based on the resume and job description, generate a list of technical and behavioral interview questions to help them prepare, tailored to their job listing and resume. This list should have exactly 4 questions total. Do not number the questions. Only respond with the questions and seperate each with |
 `;
     const response = await fetch("https://api.openai.com/v1/chat/completions", 
       {
