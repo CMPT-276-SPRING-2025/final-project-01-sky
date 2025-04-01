@@ -20,7 +20,7 @@ export default function Home() {
       </header>
 
       {/* Cards Section */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8  pb-50 px-8">
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8  pb-50">
         {/* Mock Interview Card */}
         <ButtonCard
           title="Mock Interview"
@@ -42,7 +42,7 @@ export default function Home() {
 
 
       {/* Reason Section */}
-      <section className="bg-[var(--secondary-colour)] pt-20 pb-60 px-8">
+      <section className="bg-[var(--secondary-colour)] pt-20 pb-60">
         <header className="text-center py-10">
         <h2 className="text-4xl font-bold text-black">Why Choose ReZoomé</h2>
         <p className=" text-[var(--text-colour)] mt-4 max-w-3xl mx-auto text-2xl">
