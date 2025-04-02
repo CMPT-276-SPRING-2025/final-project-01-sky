@@ -6,8 +6,28 @@ import Button from '@/components/Button';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
-  function handleSubmit(){
+  async function handleSubmit(){
     console.log("user typed:", text)
+    localStorage.setItem("mockInterviewInput", text); // store this in local storage
+    try {
+      const response = await fetch("/api/openai-mock-interview", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(text),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log("OpenAI Response:", result);
+      // optionally show it in the UI
+    } catch (error) {
+      console.error("Error calling OpenAI route:", error);
+    }
   }
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -21,34 +41,39 @@ export default function ResumeReview() {
 
       {/* Text input section */}
       <section className="bg-[var(--secondary-colour)] pb-30">
-        <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
-          <div className="flex justify-center w-full mt-8">
-            <div className="w-[980px] h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
-                <textarea 
-                    placeholder="Start typing here..." 
-                    value={text} 
-                    onChange={(e) => setText(e.target.value)}
-                    className="w-full h-full p-2 border rounded resize-none"
-                />
-                <button 
-                    onClick={() => handleSubmit(text)}
-                    className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded"
+              <div className="text-center p-5">
+              <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
+                <div className="flex justify-center w-full mt-8">
+                  <div className="w-[980px] h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
+                      <textarea 
+                          placeholder="Enter the target job listing here..." 
+                          value={text} 
+                          onChange={(e) => setText(e.target.value)}
+                          className="w-full h-full p-5 border border-gray-300 rounded resize-none"
+                      />
+                  </div>
+                </div>
+              </main>
+      
+              </div> 
+              <div className="flex justify-between mx-70">
+                <Button color="grey" href="/resume-review-1" >Go Back</Button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                    window.location.href = "/resume-review-3";
+                  }}
+                  className={`rounded-lg px-4 py-2 inline-block transition ${
+                    text
+                      ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
+                      : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+                  }`}
+                  disabled={!text}
                 >
-                    Submit
+                  Next
                 </button>
-            </div>
-          </div>
-        </main>
-
-        
-        
-        
-        </div> 
-        <div className="flex justify-between mx-70">
-          <Button color="grey" href="/" >Go Home</Button>
-          <Button color="black" href="/resume-review-2">Next</Button>
-          </div>
+                </div>
       </section>
 
     </div>

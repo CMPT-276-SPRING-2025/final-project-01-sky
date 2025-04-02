@@ -38,7 +38,7 @@ async function parseResumeWithAffinda(base64File) {
           },
           body: JSON.stringify({
               file: base64File,  // Sending the Base64 file
-              collection: "tWjKYFPQ", // Optional: replace with your Affinda collection ID
+              collection: "DbKdQIFn", // Optional: replace with your Affinda collection ID
               wait_for_review: false // 🔥 Ensures instant processing
           }),
       });
@@ -92,23 +92,14 @@ const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
 
 
 export async function processFile(file){
-    if (typeof window == "undefined") {
-        console.log("Application is on server side");
-    } else {
-        alert("Application is on client side");
-    }
+  if (typeof window == "undefined") {
+    console.log("Application is on server side");
+} else {
+    alert("Application is on client side");
+}
   console.log("using base 64 file to send to affinda")
-  let document = await parseResumeWithAffinda(file);
-  if (document.error) {
-    // Pass this up as a controlled failure
-    throw new Error(`Affinda parsing failed: ${document.details}`);
-  }
-
-  let response = await fetchResumeData(document.meta.identifier);
-
-  if (response.error) {
-    throw new Error(`Failed to fetch resume data: ${response.details}`);
-  }
+  let document = await parseResumeWithAffinda(file)
+  let response = await fetchResumeData(document.meta.identifier)
   console.log(response)
   return response
 }
