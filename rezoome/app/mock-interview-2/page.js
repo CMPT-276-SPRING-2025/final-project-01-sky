@@ -6,9 +6,29 @@ import Button from '@/components/Button';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
-    function handleSubmit(){
+
+    async function handleSubmit(){
       console.log("user typed:", text);
       localStorage.setItem("mockInterviewInput", text); // store this in local storage
+      try {
+        const response = await fetch("/api/openai-mock-interview", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(text),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+    
+        const result = await response.json();
+        console.log("Server Response:", result);
+      } catch (error) {
+        console.error("Error calling OpenAI route:", error);
+      }
+
     }
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -21,7 +41,7 @@ export default function ResumeReview() {
       </div>
 
       {/* Text input section */}
-      <section className="bg-[var(--secondary-colour)] pb-55">
+      <section className="bg-[var(--secondary-colour)] pb-30">
               <div className="text-center p-5">
               <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
                 <div className="flex justify-center w-full mt-8">
@@ -40,9 +60,11 @@ export default function ResumeReview() {
               <div className="flex justify-between mx-70">
                 <Button color="grey" href="/mock-interview-1" >Go Back</Button>
                 <button
-                  onClick={(e) => {
+
+                  onClick={async (e) => {
                     e.preventDefault();
-                    handleSubmit();
+                    await handleSubmit();
+
                     window.location.href = "/mock-interview-3";
                   }}
                   className={`rounded-lg px-4 py-2 inline-block transition ${

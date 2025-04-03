@@ -23,6 +23,24 @@ export default function ResumeReview() {
       const formattedData = interpretData(resumeData)
       console.log("Here is the formatted data:")
       console.log(formattedData)
+      try {
+        const response = await fetch('/api/openai-mock-interview', {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formattedData),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Failed to send data: ${response.status}`);
+        }
+  
+        const result = await response.json();
+        console.log("Server response:", result.message);
+      } catch (error) {
+        console.error("Error sending formatted data:", error);
+      }
     }
     else{
       console.log("Data is not readable")
@@ -122,12 +140,13 @@ function interpretData(data){
       </div>
 
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-45">
+      <section className="bg-[var(--secondary-colour)] pb-20">
         <div className="text-center p-5">
         <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-10">
           <div className="flex justify-center w-full mt-8">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>
+
           
 
         </main>
