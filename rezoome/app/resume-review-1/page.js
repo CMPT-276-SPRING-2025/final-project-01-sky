@@ -23,6 +23,7 @@ export default function ResumeReview() {
     localStorage.setItem("resumeFileDataUrl", fileDataUrl);
     localStorage.setItem("resumeFileName", file.name);
 
+
     // Handle the selected file
     const rawData = await uploadFile(file)
     if(rawData.success === true){

@@ -8,11 +8,13 @@ let currQuestion = 0;
 let questionList;
 let hasFetched = false;
 
+
 export default function InterviewPage() {
   // State to manage recording status
   const [isRecording, setIsRecording] = useState(false);
   // ref to access the video element
   const videoRef = useRef(null);
+
 
   useEffect(() => {
     // Access the user's camera
@@ -79,11 +81,13 @@ export default function InterviewPage() {
       <Header />
 
       {/* Question Box */}
+
       <section onClick={nextQuestion} className="bg-[var(--secondary-colour)] py-6 text-center w-full cursor-pointer">
         <div className="w-full max-w-2xl mx-auto bg-white p-4 rounded-xl shadow-md">
           <p id="questionNumber" className="text-gray-500 text-sm">Question 1</p>
           <h2 id="questionText"  className="text-lg font-semibold mt-1">Tell me about yourself.</h2>
           <p id="questionFraction" className="text-gray-400 text-sm mt-1">1/4</p>
+
         </div>
       </section>
 

@@ -175,6 +175,25 @@ export default function ResumeReview() {
     );
   };
 
+  const [storedText, setStoredText] = useState("");
+
+  useEffect(() => {
+    const savedText = localStorage.getItem("mockInterviewInput");
+    if (savedText) {
+      console.log("Job listing text:", savedText); // Keep it in terminal
+      setStoredText(savedText);
+    }
+  }, []);
+
+
+
+
+
+
+
+
+
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />

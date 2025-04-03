@@ -6,6 +6,7 @@ import Button from '@/components/Button';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(){
@@ -39,6 +40,7 @@ export default function ResumeReview() {
     } finally {
       setIsSubmitting(false);
     }
+
   }
 
   return (
@@ -52,6 +54,7 @@ export default function ResumeReview() {
       </div>
 
       {/* Text input section */}
+
       <section className="bg-[var(--secondary-colour)] pb-30">
         <div className="text-center p-5">
           <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
@@ -81,6 +84,7 @@ export default function ResumeReview() {
             {isSubmitting ? "Submitting..." : "Next"}
           </button>
         </div>
+
       </section>
     </div>
   );

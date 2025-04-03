@@ -6,6 +6,7 @@ import Button from '@/components/Button';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
+
     async function handleSubmit(){
       console.log("user typed:", text);
       localStorage.setItem("mockInterviewInput", text); // store this in local storage
@@ -27,6 +28,7 @@ export default function ResumeReview() {
       } catch (error) {
         console.error("Error calling OpenAI route:", error);
       }
+
     }
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -58,9 +60,11 @@ export default function ResumeReview() {
               <div className="flex justify-between mx-70">
                 <Button color="grey" href="/mock-interview-1" >Go Back</Button>
                 <button
+
                   onClick={async (e) => {
                     e.preventDefault();
                     await handleSubmit();
+
                     window.location.href = "/mock-interview-3";
                   }}
                   className={`rounded-lg px-4 py-2 inline-block transition ${
