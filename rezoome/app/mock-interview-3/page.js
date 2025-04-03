@@ -1,5 +1,7 @@
 "use client"; {/* Error popups if this is not here */}
-import { useState, useRef, useEffect } from "react"; // Add the useState import
+
+import React, { useState, useEffect } from 'react'; // Add the useState import
+
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
@@ -10,24 +12,18 @@ export default function InterviewPage() {
   // ref to access the video element
   const videoRef = useRef(null);
 
-  useEffect(() => {
-    // Access the user's camera
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        // Set the video source to the stream
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      })
-      .catch((err) => console.error("Error accessing media:", err)); //Log errors
-  }, []); // This effect runs once when the component mounts
 
-  // Function to toggle recording state
-  // This function will start or stop the recording based on the current state
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-  };
+  const [storedText, setStoredText] = useState("");
+
+  useEffect(() => {
+    const savedText = localStorage.getItem("mockInterviewInput");
+    if (savedText) {
+      console.log("Job listing text:", savedText); // Keep it in terminal
+      setStoredText(savedText);
+    }
+  }, []);
+  
+
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">

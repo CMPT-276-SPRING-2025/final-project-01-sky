@@ -20,13 +20,13 @@ export default function Home() {
       </header>
 
       {/* Cards Section */}
-      <main className="flex flex-col md:flex-row justify-center items-center gap-8  pb-50 px-8">
+      <main className="flex flex-col md:flex-row justify-center items-center gap-8  pb-50">
         {/* Mock Interview Card */}
         <ButtonCard
           title="Mock Interview"
           altText="This image is a snippet of the Mock Interview feature on step 3, where you can read your feedback and suggestions based on your interview performance."
           description="Practice with realistic interview questions tailored to your target job."
-          imageSrc="/mock-interview.jpg"
+          imageSrc="/mock-interview.png"
           link="/mock-interview-1"
         />
 
@@ -35,14 +35,14 @@ export default function Home() {
           title="Resume Review"
           altText="This image is a snippet of the Resume Review feature on step 3, where you have your uploaded resume on the left and your feedback and suggestions on the right."
           description="Get expert feedback to make your resume stand out to employers."
-          imageSrc="/resume-review.jpg"
+          imageSrc="/resume-review.png"
           link="/resume-review-1"
         />
       </main>
 
 
       {/* Reason Section */}
-      <section className="bg-[var(--secondary-colour)] pt-20 pb-60 px-8">
+      <section className="bg-[var(--secondary-colour)] pt-20 pb-60">
         <header className="text-center py-10">
         <h2 className="text-4xl font-bold text-black">Why Choose ReZoomé</h2>
         <p className=" text-[var(--text-colour)] mt-4 max-w-3xl mx-auto text-2xl">

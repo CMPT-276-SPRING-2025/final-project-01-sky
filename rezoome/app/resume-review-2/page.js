@@ -6,21 +6,55 @@ import Button from '@/components/Button';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
-  function handleSubmit(){
-    console.log("user typed:", text)
-    localStorage.setItem("mockInterviewInput", text); // store this in local storage
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(){
+    if (!text.trim()) return;
+    
+    setIsSubmitting(true);
+    console.log("Job listing input:", text);
+    
+    // Store job listing in localStorage
+    localStorage.setItem("jobListingData", text);
+    
+    try {
+      const response = await fetch('/api/openai-resume-review', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(text),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log("Server response:", result.message);
+      window.location.href = "/resume-review-3";
+    } catch (error) {
+      console.error("Error sending job listing data:", error);
+      alert("There was a problem submitting your job listing. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+
   }
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
       <div className="text-center p-20">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-        Get expert feedback to make your resume stand out to employers.
+        Copy and paste the job posting text of your target job.
         </p>
       </div>
 
       {/* Text input section */}
+
       <section className="bg-[var(--secondary-colour)] pb-55">
               <div className="text-center p-5">
               <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
@@ -55,9 +89,8 @@ export default function ResumeReview() {
                   Next
                 </button>
                 </div>
-      </section>
 
+      </section>
     </div>
-    
   );
 }
