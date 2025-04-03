@@ -1,12 +1,11 @@
 # 🏆 ReZoomé
 
----
 
 ## Group Information
 - Group Number: 1
 - Group Name: SKY
 
----
+
 
 ## Mock Interview Simulation
 
@@ -15,7 +14,7 @@ Our project is a **mock interview simulation** and **resume review** that uses *
 
 This targets people who want practice and feedback on the job interview process and resume in one streamlined application. It aims to solve how there aren't very clear ways to practice the interviewing process by yourself. With the modern advancements in AI, we can use it to give better and more relevant questions and feedback with the changing landscape of the job market. The questions and feedback will be adapted depending on your resume and what type of job you are applying for. The interview practice will imitate online interviews with live audio and visual recordings. 
 
----
+
 
 ## 🌟 Features  
 - **Resume Review**: Upload your resume and get instant AI-powered feedback.  
@@ -23,7 +22,7 @@ This targets people who want practice and feedback on the job interview process 
 - **Interview Analysis**: Receive a score and improvement tips after each session.  
 - **AI-Powered Insights**: Get personalized suggestions to enhance your responses. ## Features
 
----
+
 
 ## 🛠️ Tech Stack 
 - **Programming Languages**: JavaScript, CSS
@@ -33,7 +32,7 @@ This targets people who want practice and feedback on the job interview process 
 - **AI Integration**: OpenAI API, Affinda API  
 - **Testing**: Jest & Testing Library  
 
----
+
 
 ## 🏗️ Getting Started – Local Deployment Instructions  
 Follow these steps to run the project locally on your machine.  
@@ -66,7 +65,7 @@ Create a `.env.local` file in the root directory and add the following:
 OPENAI_API_KEY=your-api-key-here
 AFFINDA_API_KEY=your-api-key-here
 ```
-> Replace `your-api-key-here` with actual API keys.  
+Replace `your-api-key-here` with actual API keys.  
 
 ### **5. Run the Development Server**  
 Using npm:  
@@ -82,7 +81,7 @@ To run Jest tests:
 npm run test
 ```
 
----
+
 
 
 ## 🔗 Project Links  
@@ -91,10 +90,8 @@ npm run test
 - **Final Report**: [Insert Link Here]  
 - **GitHub Repository**: [GitHub Repository](https://github.com/CMPT-276-SPRING-2025/final-project-01-sky)
 
----
 
 ## ⚖️ License & Usage  
 This project is licensed under the MIT license and is intended strictly for educational and training purposes. The AI-generated interview questions should be used responsibly for mock interviews only.
 ```
 
-This is the exact format you can copy and paste into your README file. Let me know if you want any changes! 🚀😃
