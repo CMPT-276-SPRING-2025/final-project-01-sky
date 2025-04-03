@@ -47,7 +47,11 @@ Make sure the following are installed:
 
 ### **2. Clone the Repository**  
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/rezoome.git
+git clone git@github.com:CMPT-276-SPRING-2025/final-project-01-sky.git
+```
+Navigate to the root directory:
+```bash
+cd final-project-01-sky/rezoome
 ```
 
 ### **3. Install Dependencies**  
