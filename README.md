@@ -93,5 +93,4 @@ npm run test
 
 ## ⚖️ License & Usage  
 This project is licensed under the MIT license and is intended strictly for educational and training purposes. The AI-generated interview questions should be used responsibly for mock interviews only.
-```
 
