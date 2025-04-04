@@ -12,7 +12,7 @@ const Footer = () => {
             <div className="text-white p-6">
 
               <p className='font-bold text-left'>About Project</p>
-              <p className='text-left'>This is a group project for Spring 2025 CMPT 276 D200.</p>
+              <p className='text-left'>This is a group project for Spring 2025 CMPT 276 D200</p>
             </div>
             <div className="text-white p-6">
             <p className='font-bold text-left mb-4'>Quick Links</p>
