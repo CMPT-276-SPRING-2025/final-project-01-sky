@@ -204,7 +204,7 @@ export default function ResumeReview() {
         </p>
       </div>
 
-      <section className="bg-[var(--secondary-colour)] pb-30 pt-20">
+      <section className="bg-[var(--secondary-colour)] pb-75 pt-20">
         {loading ? (
           <div className="max-w-5xl mx-auto text-center py-10">
             <p className="text-lg">Analyzing your resume against the job listing...</p>
