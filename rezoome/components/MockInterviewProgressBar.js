@@ -1,15 +1,16 @@
-// component for progress bar in resume review and interview page
+// component for progress bar in mock interview pages
 import React from 'react';
 
-const ProgressBar = ({ currentStep }) => {
+const MockInterviewProgressBar = ({ currentStep }) => {
   const steps = [
     { number: 1, label: 'Upload Resume' },
     { number: 2, label: 'Add Job' },
-    { number: 3, label: 'View Results' }
+    { number: 3, label: 'Interview' },
+    { number: 4, label: 'View Feedback' }
   ];
 
   return (
-    <div className="flex justify-center items-center w-full max-w-xl mx-auto my-8">
+    <div className="flex justify-center items-center w-full max-w-2xl mx-auto my-8">
       {steps.map((step, index) => (
         <React.Fragment key={step.number}>
           {/* Step Circle */}
@@ -53,8 +54,4 @@ const ProgressBar = ({ currentStep }) => {
   );
 };
 
-export default ProgressBar;
-
-
-
-
+export default MockInterviewProgressBar;

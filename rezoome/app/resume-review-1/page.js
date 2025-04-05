@@ -5,7 +5,6 @@ import Header from '../../components/Header';
 import ProgressBar from "../../components/ProgressBar";
 import FileUpload from "../../components/FileUpload";
 import '../globals.css';
-
 import Button from "@/components/Button";
 
 export default function ResumeReview() {
@@ -151,12 +150,14 @@ export default function ResumeReview() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
-      <div className="text-center p-20">
+      <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
         Upload the resume you'd use to apply for your target job.
         </p>
       </div>
+
+      <ProgressBar currentStep={1} />
 
       {/* Upload File Section */}
       <section className="bg-[var(--secondary-colour)] pb-45">
