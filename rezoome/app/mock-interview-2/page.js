@@ -3,6 +3,7 @@ import React, { useState } from 'react'; // Add the useState import
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
+import MockInterviewProgressBar from '@/components/MockInterviewProgressBar';
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
@@ -33,12 +34,14 @@ export default function ResumeReview() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
-      <div className="text-center p-20">
+      <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-        Practice with realistic interview questions tailored to your target job.
+        Copy and paste the job posting text of your target job.
         </p>
       </div>
+
+      <MockInterviewProgressBar currentStep={2} />
 
       {/* Text input section */}
       <section className="bg-[var(--secondary-colour)] pb-55">
