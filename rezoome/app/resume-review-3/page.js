@@ -14,11 +14,23 @@ export default function ResumeReview() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [processingProgress, setProcessingProgress] = useState(0);
 
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
         setLoading(true);
+        
+        // Start progress animation
+        const progressInterval = setInterval(() => {
+          setProcessingProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90; // Cap at 90% until actual completion
+            }
+            return prev + 10;
+          });
+        }, 500);
         
         // Get data from localStorage
         const storedResumeData = localStorage.getItem("resumeData");
@@ -27,6 +39,7 @@ export default function ResumeReview() {
         const storedResumeFileName = localStorage.getItem("resumeFileName");
         
         if (!storedResumeData || !storedJobListing) {
+          clearInterval(progressInterval);
           throw new Error("Missing resume or job listing data. Please go back and try again.");
         }
         
@@ -50,6 +63,7 @@ export default function ResumeReview() {
         const response = await fetch(url);
         
         if (!response.ok) {
+          clearInterval(progressInterval);
           const errorData = await response.json();
           throw new Error(errorData.error || "Failed to fetch feedback");
         }
@@ -68,10 +82,19 @@ export default function ResumeReview() {
         } else {
           setSuggestions([]);
         }
+        
+        // Set progress to 100% when complete
+        clearInterval(progressInterval);
+        setProcessingProgress(100);
+        
+        // Short delay before removing loading state
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+        
       } catch (err) {
         console.error("Error fetching feedback:", err);
         setError(err.message);
-      } finally {
         setLoading(false);
       }
     };
@@ -96,104 +119,22 @@ export default function ResumeReview() {
     );
   };
 
-  // Render the PDF file or fallback to parsed data if not available
-  const renderResumePreview = () => {
+  // Function to handle file download
+  const handleResumeDownload = () => {
     if (resumeFileUrl) {
-      const isPdf = resumeFileName?.toLowerCase().endsWith('.pdf');
-
-      if (isPdf) {
-        // PDF embedded viewer
-        return (
-          <div className="h-full">
-            <p className="font-medium text-sm mb-2">{resumeFileName}</p>
-            <iframe 
-              src={resumeFileUrl} 
-              className="w-full h-[500px] border border-gray-200 rounded" 
-              title="Resume PDF"
-            />
-          </div>
-        );
-      } else {
-        // Image preview (if file was an image format)
-        return (
-          <div className="h-full">
-            <p className="font-medium text-sm mb-2">{resumeFileName}</p>
-            <img 
-              src={resumeFileUrl} 
-              alt="Resume" 
-              className="w-full border border-gray-200 rounded max-h-[500px] object-contain"
-            />
-          </div>
-        );
-      }
+      const link = document.createElement('a');
+      link.href = resumeFileUrl;
+      link.download = resumeFileName || 'resume-file';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-
-    // Fallback to the parsed resume data if no file is available
-    if (!resumeData) return (
-      <>
-        <h3 className="font-semibold">Resume Preview</h3>
-        <p className="text-gray-500 text-xs mt-4 italic">Resume data not available</p>
-      </>
-    );
-
-    return (
-      <>
-        <h3 className="font-semibold">{resumeData.name || "NAME NOT AVAILABLE"}</h3>
-        
-        {resumeData.education && resumeData.education.length > 0 && (
-          <div className="mt-3">
-            <p className="font-medium text-sm">Education:</p>
-            {resumeData.education.map((edu, i) => (
-              <p key={i} className="text-gray-600 text-xs">
-                {edu.institution} - {edu.degree} {edu.major && `in ${edu.major}`} {edu.date && `(${edu.date})`}
-              </p>
-            ))}
-          </div>
-        )}
-        
-        {resumeData.skills && resumeData.skills.length > 0 && (
-          <div className="mt-3">
-            <p className="font-medium text-sm">Skills:</p>
-            <p className="text-gray-600 text-xs">{resumeData.skills.join(", ")}</p>
-          </div>
-        )}
-        
-        {resumeData.workExperience && resumeData.workExperience.length > 0 && (
-          <div className="mt-3">
-            <p className="font-medium text-sm">Experience:</p>
-            {resumeData.workExperience.slice(0, 2).map((job, i) => (
-              <div key={i} className="text-gray-600 text-xs mt-1">
-                <p className="font-medium">{job.jobTitle} at {job.company}</p>
-                <p>{job.startDate} - {job.endDate || "Present"}</p>
-              </div>
-            ))}
-            {resumeData.workExperience.length > 2 && (
-              <p className="text-gray-500 text-xs italic">+ {resumeData.workExperience.length - 2} more positions</p>
-            )}
-          </div>
-        )}
-      </>
-    );
   };
 
-  const [storedText, setStoredText] = useState("");
-
-  useEffect(() => {
-    const savedText = localStorage.getItem("mockInterviewInput");
-    if (savedText) {
-      console.log("Job listing text:", savedText); // Keep it in terminal
-      setStoredText(savedText);
-    }
-  }, []);
-
-
-
-
-
-
-
-
-
+  // Handle go back to job listing page
+  const handleGoBack = () => {
+    window.location.href = "/resume-review-2";
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -207,11 +148,25 @@ export default function ResumeReview() {
 
       <ProgressBar currentStep={3} />
 
-      <section className="bg-[var(--secondary-colour)] pb-75 pt-20">
+      <section className="bg-[var(--secondary-colour)] pb-75 pt-10">
         {loading ? (
-          <div className="max-w-5xl mx-auto text-center py-10">
-            <p className="text-lg">Analyzing your resume against the job listing...</p>
-            <div className="mt-4 w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin mx-auto"></div>
+          <div className="max-w-5xl mx-auto px-8 py-5 pb-100">
+            <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+              <p className="text-lg font-medium text-gray-700 mb-2">
+                Analyzing your resume against the job listing...
+              </p>
+              <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2">
+                <div 
+                  className="bg-[var(--second-button-colour)] h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                  style={{ width: `${processingProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500">
+                {processingProgress < 100 
+                  ? "Analyzing and extracting insights from your resume and job posting..." 
+                  : "Analysis complete!"}
+              </p>
+            </div>
           </div>
         ) : error ? (
           <div className="max-w-5xl mx-auto text-center py-10">
@@ -219,44 +174,75 @@ export default function ResumeReview() {
             <p className="mt-2">Please go back and try again.</p>
           </div>
         ) : (
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 pb-8 px-8">
-            {/* Resume Section */}
-            <div className="col-span-1 flex flex-col">
-              <h2 className="text-lg font-bold mb-2">Your Resume</h2>
-              <div className="bg-white p-4 rounded-lg shadow-lg flex-grow flex flex-col">
-                <div className="border border-gray-300 rounded-lg p-4 flex-grow">
-                  {renderResumePreview()}
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 px-8">
+            {/* Left column - Resume and Job Posting */}
+            <div className="flex flex-col gap-6">
+              {/* Resume Download Section */}
+              <div>
+                <h2 className="text-lg font-bold mb-2">Your Resume</h2>
+                <div className="bg-white rounded-lg shadow-lg h-36">
+                  <div className="border border-gray-200 rounded-lg h-full flex items-center p-4">
+                    <div className="bg-[var(--second-button-colour)] p-3 rounded-lg mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <button 
+                      onClick={handleResumeDownload}
+                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    >
+                      {resumeFileName || "Download Resume"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Feedback Section */}
+              <div>
+                <h2 className="text-lg font-bold mb-2">Feedback</h2>
+                <div className="bg-white rounded-lg shadow-lg">
+                  <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
+                    <p className="text-gray-600 whitespace-pre-line">
+                      {feedback}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Feedback & Suggestions */}
-            <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
-              {/* Feedback Section */}
+            {/* Right column - Feedback & Suggestions */}
+            <div className="flex flex-col gap-6">
+
+              {/* Job Posting Section */}
               <div>
-                <h2 className="text-lg font-bold mb-2">Feedback</h2>
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  <p className="text-gray-600 whitespace-pre-line">
-                    {feedback}
-                  </p>
+                <h2 className="text-lg font-bold mb-2">Job Posting</h2>
+                <div className="bg-white rounded-lg shadow-lg">
+                  <div className="border border-gray-200 rounded-lg p-4 h-36 overflow-y-auto">
+                    <p className="text-gray-600 whitespace-pre-line text-sm">
+                      {jobListing || "No job posting available."}
+                    </p>
+                  </div>
                 </div>
               </div>
+              
 
               {/* Suggestions Section */}
               <div>
                 <h2 className="text-lg font-bold mb-2">Suggestions</h2>
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  {renderSuggestions()}
+                <div className="bg-white rounded-lg shadow-lg">
+                  <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
+                    {renderSuggestions()}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-<div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between mt-6 px-8 pb-8">
-  <Button color="grey" href="/resume-review-2">Go Back</Button>
-  <Button color="black" href="/">Go Home</Button>
-</div>
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between mt-6 px-8 pb-8">
+          <Button color="grey" onClick={handleGoBack}>Go Back</Button>
+          <Button color="black" href="/">Go Home</Button>
+        </div>
       </section>
     </div>
   );
