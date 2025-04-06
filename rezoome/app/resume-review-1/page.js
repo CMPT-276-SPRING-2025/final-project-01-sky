@@ -161,37 +161,44 @@ export default function ResumeReview() {
 
       {/* Upload File Section */}
       <section className="bg-[var(--secondary-colour)] pb-45">
-        <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-10 ">
-          <div className="flex justify-center w-full mt-8">
-            <FileUpload onFileSelect={handleFileSelect} />
-          </div>
-        </main>
+  <div className="text-center p-5">
+    <main className="flex flex-col items-center gap-8 mt-8 pb-10 ">
 
-        
-        
-        
-        </div> 
-        <div className="flex justify-between mx-70">
-          <Button color="grey" href="/" >Go Home</Button>
-          <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (fileUploaded) {
-                    window.location.href = "/resume-review-2";
-                  }
-                }}
-                className={`rounded-lg px-4 py-2 inline-block transition ${
-                  fileUploaded
-                    ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
-                    : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-                }`}
-                disabled={!fileUploaded}
-              >
-                Next
-          </button>
-          </div>
-      </section>
+      <div className="w-[980px]">
+        <FileUpload onFileSelect={handleFileSelect} />
+      </div>
+
+      {/* Wrapping buttons in a div with same width as the upload box */}
+  <div className="flex justify-between mx-auto max-w-[980px] w-full ">
+    <Button color="grey" href="/" className="w-full md:w-auto">
+      Go Home
+    </Button>
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        if (fileUploaded) {
+          window.location.href = "/resume-review-2";
+        }
+      }}
+      className={`rounded-lg px-4 py-2 inline-block w-full md:w-auto transition ${
+        fileUploaded
+          ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
+          : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+      }`}
+      disabled={!fileUploaded}
+    >
+      Next
+    </button>
+  </div>
+      
+    </main>
+  </div>
+
+
+</section>
+
+
+
 
     </div>
     

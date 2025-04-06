@@ -60,9 +60,11 @@ export default function ResumeReview() {
 
       <section className="bg-[var(--secondary-colour)] pb-55">
         <div className="text-center p-5">
-          <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 ">
-            <div className="flex justify-center w-full mt-8">
-              <div className="w-[980px] h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
+          <main className="flex flex-col items-center gap-8 mt-8 ">
+
+
+            <div className="w-[980px]">
+              <div className="h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
                 <textarea 
                   placeholder="Enter the target job posting here..." 
                   value={text} 
@@ -71,9 +73,8 @@ export default function ResumeReview() {
                 />
               </div>
             </div>
-          </main>
-        </div> 
-        <div className="flex justify-between mx-70">
+
+            <div className="w-[980px] flex justify-between">
           <Button color="grey" href="/resume-review-1">Go Back</Button>
           <button
             onClick={handleSubmit}
@@ -87,6 +88,9 @@ export default function ResumeReview() {
             {isSubmitting ? "Submitting..." : "Next"}
           </button>
         </div>
+          </main>
+        </div> 
+        
 
       </section>
     </div>
