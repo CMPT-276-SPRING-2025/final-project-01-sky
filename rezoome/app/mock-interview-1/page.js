@@ -45,26 +45,15 @@ export default function ResumeReview() {
       console.log(formattedData);
       
       try {
-        const response = await fetch('/api/openai-mock-interview', {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formattedData),
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Failed to send data: ${response.status}`);
-        }
-  
-        const result = await response.json();
-        console.log("Server response:", result.message);
-        
-        // Finally set fileUploaded to true when everything is done
+        // Save the formatted data JSON in localStorage
+        localStorage.setItem("mockInterviewResume", JSON.stringify(formattedData));
+        console.log("Resume data saved to localStorage");
+      
+        // Simulate successful completion
         setFileUploaded(true);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error sending formatted data:", error);
+        console.error("Error saving formatted data to localStorage:", error);
         setIsLoading(false);
       }
     }

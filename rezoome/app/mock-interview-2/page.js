@@ -12,22 +12,11 @@ export default function ResumeReview() {
       console.log("user typed:", text);
       localStorage.setItem("mockInterviewInput", text); // store this in local storage
       try {
-        const response = await fetch("/api/openai-mock-interview", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(text),
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-    
-        const result = await response.json();
-        console.log("Server Response:", result);
+        // Save the job listing text in localStorage
+        localStorage.setItem("mockInterviewInput", text);
+        console.log("Job listing saved to localStorage");
       } catch (error) {
-        console.error("Error calling OpenAI route:", error);
+        console.error("Error saving job listing to localStorage:", error);
       }
 
     }
