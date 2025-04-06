@@ -145,41 +145,40 @@ function interpretData(data){
 
       {/* Upload File Section */}
       <section className="bg-[var(--secondary-colour)] pb-45">
-        <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-10">
-          <div className="flex justify-center w-full mt-8">
-            <FileUpload onFileSelect={handleFileSelect} />
-          </div>
+  <div className="text-center p-5">
+    <main className="flex flex-col items-center gap-8 mt-8 pb-10">
+      
+      {/* File Upload Box */}
+      <div className="w-[980px]">
+        <FileUpload onFileSelect={handleFileSelect} />
+      </div>
 
-          
+      {/* Buttons */}
+      <div className="w-[980px] flex justify-between">
+        <Button color="grey" href="/">Go Home</Button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            if (fileUploaded) {
+              window.location.href = "/mock-interview-2";
+            }
+          }}
+          className={`rounded-lg px-4 py-2 inline-block transition ${
+            fileUploaded
+              ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
+              : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+          }`}
+          disabled={!fileUploaded}
+        >
+          Next
+        </button>
+      </div>
 
-        </main>
-        <div className="flex justify-between mx-60">
-          <Button color="grey" href="/" >Go Home</Button>
-          <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (fileUploaded) {
-                    window.location.href = "/mock-interview-2";
-                  }
-                }}
-                className={`rounded-lg px-4 py-2 inline-block transition ${
-                  fileUploaded
-                    ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
-                    : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-                }`}
-                disabled={!fileUploaded}
-              >
-                Next
-          </button>
-          </div>
-        
-        </div> 
+    </main>
+  </div>
+</section>
 
-        
 
-        
-      </section>
 
       
 

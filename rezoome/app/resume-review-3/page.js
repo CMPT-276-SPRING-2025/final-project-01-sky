@@ -253,10 +253,10 @@ export default function ResumeReview() {
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row justify-between mx-70 mt-6">
-          <Button color="grey" href="/resume-review-2">Go Back</Button>
-          <Button color="black" href="/">Go Home</Button>
-        </div>
+<div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between mt-6 px-8 pb-8">
+  <Button color="grey" href="/resume-review-2">Go Back</Button>
+  <Button color="black" href="/">Go Home</Button>
+</div>
       </section>
     </div>
   );

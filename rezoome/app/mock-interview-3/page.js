@@ -116,10 +116,12 @@ export default function InterviewPage() {
       </section>
 
       {/* Navigation Buttons */}
-      <section className="flex justify-between mx-70 px-8">
-        <Button color="grey" href="/mock-interview-2">Go Back</Button>
-        <Button color="black" href="/mock-interview-4">Next</Button>
-      </section>
+      {/* Navigation Buttons */}
+<section className="flex justify-between mx-auto max-w-[980px] pb-8 mt-6">
+  <Button color="grey" href="/mock-interview-2">Go Back</Button>
+  <Button color="black" href="/mock-interview-4">Next</Button>
+</section>
+
       </section>
     </div>
   );
