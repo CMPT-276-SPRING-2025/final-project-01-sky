@@ -5,24 +5,45 @@ import Header from '../../components/Header';
 import FileUpload from "../../components/FileUpload";
 import '../globals.css';
 import Button from "@/components/Button";
+import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
 
 export default function ResumeReview() {
   const [fileUploaded, setFileUploaded] = useState(false); // track file upload state; initially set it to false
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [fileName, setFileName] = useState("");
 
   const handleFileSelect = async (file) => {
     console.log("File selected:", file);
-    setFileUploaded(true); // set the file upload to true once there is one uploaded
+    setFileName(file.name);
+    setIsLoading(true);
     
+    // Simulate progress updates - in production, you'd get real progress from API if available
+    const progressInterval = setInterval(() => {
+      setProcessingProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90; // Cap at 90% until actual completion
+        }
+        return prev + 10;
+      });
+    }, 500);
     
     // handle the selected file
-    const rawData = await uploadFile(file)
+    const rawData = await uploadFile(file);
+    
+    // Clear the interval regardless of the result
+    clearInterval(progressInterval);
+    
     if(rawData.success === true){
-      const resumeData = rawData.data.data
-      console.log("Interperting data")
-      const formattedData = interpretData(resumeData)
-      console.log("Here is the formatted data:")
-      console.log(formattedData)
+      setProcessingProgress(100); // Set to 100% when complete
+      
+      const resumeData = rawData.data.data;
+      console.log("Interperting data");
+      const formattedData = interpretData(resumeData);
+      console.log("Here is the formatted data:");
+      console.log(formattedData);
+      
       try {
         const response = await fetch('/api/openai-mock-interview', {
           method: "POST",
@@ -38,12 +59,19 @@ export default function ResumeReview() {
   
         const result = await response.json();
         console.log("Server response:", result.message);
+        
+        // Finally set fileUploaded to true when everything is done
+        setFileUploaded(true);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error sending formatted data:", error);
+        setIsLoading(false);
       }
     }
     else{
-      console.log("Data is not readable")
+      console.log("Data is not readable");
+      setIsLoading(false);
+      setProcessingProgress(0); // Reset progress on error
     }
   };
 
@@ -126,33 +154,84 @@ function interpretData(data){
     hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
     patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
   };
-  return(jsonOutput)
+  return(jsonOutput);
 }
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
-      <div className="text-center p-20">
+      <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-        Practice with realistic interview questions tailored to your target job.
+        Upload the resume you'd use to apply for your target job.
         </p>
       </div>
 
+      <MockInterviewProgressBar currentStep={1} />
+
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-20">
+      <section className="bg-[var(--secondary-colour)] pb-45">
         <div className="text-center p-5">
-        <main className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8 pb-10">
-          <div className="flex justify-center w-full mt-8">
-            <FileUpload onFileSelect={handleFileSelect} />
-          </div>
+          <main className="flex flex-col items-center gap-8 mt-8 pb-10">
+            
+            {/* File Upload Box */}
+            <div className="w-[980px]">
+              {!isLoading && !fileUploaded ? (
+                <FileUpload onFileSelect={handleFileSelect} />
+              ) : isLoading ? (
+                <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+                  <p className="text-lg font-medium text-gray-700 mb-2">
+                    Processing {fileName}
+                  </p>
+                  <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2">
+                    <div 
+                      className="bg-[var(--second-button-colour)] h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                      style={{ width: `${processingProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    {processingProgress < 100 
+                      ? "Analyzing and extracting information from your resume..." 
+                      : "Analysis complete!"}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="bg-[var(--second-button-colour)] p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="font-medium text-lg text-gray-900">{fileName}</h3>
+                        <p className="text-sm text-[var(--second-button-colour)]">Successfully processed</p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => {
+                          setFileUploaded(false);
+                          setFileName("");
+                        }} 
+                        className="text-sm text-gray-500 hover:text-gray-700 transition flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Replace
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          
-
-        </main>
-        <div className="flex justify-between mx-60">
-          <Button color="grey" href="/" >Go Home</Button>
-          <button
+            {/* Buttons */}
+            <div className="flex justify-between mx-auto max-w-[980px] w-full">
+              <Button color="grey" href="/">Go Home</Button>
+              <button
                 onClick={(e) => {
                   e.preventDefault();
                   if (fileUploaded) {
@@ -164,22 +243,15 @@ function interpretData(data){
                     ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
                     : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
                 }`}
-                disabled={!fileUploaded}
+                disabled={!fileUploaded || isLoading}
               >
                 Next
-          </button>
-          </div>
-        
-        </div> 
+              </button>
+            </div>
 
-        
-
-        
+          </main>
+        </div>
       </section>
-
-      
-
     </div>
-    
   );
 }

@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
+import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
 
 let currQuestion = 0;
 let questionList;
@@ -148,10 +149,19 @@ export default function InterviewPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
+      <div className="text-center pt-20 pb-5">
+        <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
+        <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
+        Practice with realistic interview questions tailored to your target job.
+        </p>
+      </div>
+
+      <MockInterviewProgressBar currentStep={3} />
 
       {/* Question Box */}
-      <section onClick={nextQuestion} className="bg-[var(--secondary-colour)] py-6 text-center w-full cursor-pointer">
-        <div className="w-full max-w-2xl mx-auto bg-white p-4 rounded-xl shadow-md">
+
+      <section onClick={nextQuestion} className="bg-[var(--secondary-colour)] py-6 text-center w-full cursor-pointer pt-13">
+        <div className="w-full max-w-[980px] mx-auto bg-white p-4 rounded-xl shadow-md">
           <p id="questionNumber" className="text-gray-500 text-sm">Question 1</p>
           <h2 id="questionText" className="text-lg font-semibold mt-1">Tell me about yourself.</h2>
           <p id="questionFraction" className="text-gray-400 text-sm mt-1">1/4</p>
@@ -159,7 +169,7 @@ export default function InterviewPage() {
             <span className="font-semibold">Your Answer:</span> {transcription || "Click 'Answer Question' to begin."}
           </p>
         </div>
-      </section>
+      
 
       {/* Video + Recording Section */}
       <section className="flex flex-col items-center justify-center mt-8">
@@ -182,9 +192,12 @@ export default function InterviewPage() {
       </section>
 
       {/* Navigation Buttons */}
-      <section className="flex justify-between mx-70 px-8">
-        <Button color="grey" href="/mock-interview-2">Go Back</Button>
-        <Button color="black" href="/mock-interview-4">Next</Button>
+      {/* Navigation Buttons */}
+<section className="flex justify-between mx-auto max-w-[980px] pb-8 mt-6">
+  <Button color="grey" href="/mock-interview-2">Go Back</Button>
+  <Button color="black" href="/mock-interview-4">Next</Button>
+</section>
+
       </section>
     </div>
   );
