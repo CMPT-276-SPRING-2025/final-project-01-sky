@@ -45,7 +45,9 @@ export default function InterviewPage() {
   }, []);
 
   function nextQuestion() {
-    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % 4);
+    if (!isAnswering && !isProcessing) {
+      setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % 4);
+    }
   }
 
   const recordAnswerChunk = async () => {
@@ -71,17 +73,38 @@ export default function InterviewPage() {
             body: formData,
           });
           const json = await res.json();
+          let cleanText = (json.transcription || "").trim().toLowerCase();
 
-          let cleanText = (json.transcription || "").trim();
+          const hallucinationPhrases = [
+            "bye bye",
+            "thank you for watching",
+            "thank you.",
+            "thanks for watching",
+            "see you next time",
+            "goodbye",
+            "the end"
+          ];
 
-          // Optional: very short or nonsense phrases are likely noise
-          if (!cleanText || cleanText.length < 5 || /^[\W\d\s]+$/.test(cleanText)) {
+          if (
+            !cleanText ||
+            cleanText.length < 5 ||
+            hallucinationPhrases.includes(cleanText) ||
+            /^[\W\d\s]+$/.test(cleanText)
+          ) {
             cleanText = "No response";
+          } else {
+            const englishLetters = cleanText.match(/[a-zA-Z]/g) || [];
+            const density = englishLetters.length / cleanText.length;
+            if (density < 0.7) {
+              cleanText = "Unintelligible";
+            }
           }
 
           const newResponses = [...responses];
           newResponses[currentQuestionIndex] = cleanText;
           setResponses(newResponses);
+          localStorage.setItem("mockInterviewResponses", JSON.stringify(newResponses));
+
         } catch (err) {
           console.error("Whisper error:", err);
         } finally {
@@ -128,7 +151,7 @@ export default function InterviewPage() {
         <button
           className="mt-6 px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition"
           onClick={recordAnswerChunk}
-          disabled={isProcessing && !isAnswering}
+          disabled={!currentQuestion || (isProcessing && !isAnswering)}
         >
           {isProcessing
             ? "Loading..."
