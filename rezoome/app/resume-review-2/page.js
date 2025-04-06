@@ -1,5 +1,5 @@
 "use client"; {/* Error popups if this is not here */}
-import React, { useState } from 'react'; // Add the useState import
+import React, { useState, useEffect } from 'react'; // Add the useEffect import
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
@@ -7,6 +7,24 @@ import ProgressBar from "../../components/ProgressBar";
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
+  const [charCount, setCharCount] = useState(0);
+  const MAX_CHARS = 6000;
+
+  // Load previously saved job listing data on component mount
+  useEffect(() => {
+    const savedJobListing = localStorage.getItem("jobListingData");
+    if (savedJobListing) {
+      setText(savedJobListing);
+      setCharCount(savedJobListing.length);
+    }
+  }, []);
+
+  // Update the onChange handler for the textarea
+  const handleTextChange = (e) => {
+    const newText = e.target.value.slice(0, MAX_CHARS);
+    setText(newText);
+    setCharCount(newText.length);
+  }
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,8 +59,13 @@ export default function ResumeReview() {
     } finally {
       setIsSubmitting(false);
     }
-
   }
+
+  // Check if resume data exists before allowing navigation to next step
+  const handleGoBack = () => {
+    // No special checks needed here - just navigate back
+    window.location.href = "/resume-review-1";
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
@@ -57,41 +80,40 @@ export default function ResumeReview() {
       <ProgressBar currentStep={2} />
 
       {/* Text input section */}
-
-      <section className="bg-[var(--secondary-colour)] pb-55">
+      <section className="bg-[var(--secondary-colour)] pb-100">
         <div className="text-center p-5">
           <main className="flex flex-col items-center gap-8 mt-8 ">
-
-
             <div className="w-[980px]">
-              <div className="h-[261px] bg-white rounded-lg flex justify-center items-center relative cursor-pointer"> 
+              <div className="h-[261px] bg-white rounded-lg flex flex-col justify-center items-center relative cursor-pointer"> 
                 <textarea 
                   placeholder="Enter the target job posting here..." 
                   value={text} 
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={handleTextChange}
                   className="w-full h-full p-5 border border-gray-300 rounded resize-none"
+                  maxLength={MAX_CHARS}
                 />
+                <div className="text-sm text-gray-500 absolute bottom-2 right-4">
+                  {charCount}/{MAX_CHARS}
+                </div>
               </div>
             </div>
 
             <div className="w-[980px] flex justify-between">
-          <Button color="grey" href="/resume-review-1">Go Back</Button>
-          <button
-            onClick={handleSubmit}
-            className={`rounded-lg px-4 py-2 inline-block transition ${
-              text && !isSubmitting
-                ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
-                : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-            }`}
-            disabled={!text || isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Next"}
-          </button>
-        </div>
+              <Button color="grey" onClick={handleGoBack}>Go Back</Button>
+              <button
+                onClick={handleSubmit}
+                className={`rounded-lg px-4 py-2 inline-block transition ${
+                  text && !isSubmitting
+                    ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
+                    : "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+                }`}
+                disabled={!text || isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Next"}
+              </button>
+            </div>
           </main>
-        </div> 
-        
-
+        </div>
       </section>
     </div>
   );
