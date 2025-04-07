@@ -9,7 +9,7 @@ describe('isValidResume', () => {
   it('returns true for a valid resume', () => {
     const resume = {
       name: "John Doe", // name should be required on a resume
-      education: [{ institution: "XYZ University" }], // education should be filled
+      education: [{ institution: "Simon Fraser University" }], // education should be filled
       workExperience: [],
       skills: []
     };
