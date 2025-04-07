@@ -151,7 +151,7 @@ export default function ResumeReview() {
       <section className="bg-[var(--secondary-colour)] pb-75 pt-10">
         {loading ? (
           <div className="max-w-5xl mx-auto px-8 py-5 pb-100">
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+            <div className="bg-white border-1 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
               <p className="text-lg font-medium text-gray-700 mb-2">
                 Analyzing your resume against the job listing...
               </p>
