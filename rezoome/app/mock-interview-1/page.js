@@ -6,12 +6,15 @@ import FileUpload from "../../components/FileUpload";
 import '../globals.css';
 import Button from "@/components/Button";
 import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
+import { isValidResume } from '../../utils/isResume';
+import ErrorPopup from "@/components/ErrorPopup";
 
 export default function ResumeReview() {
   const [fileUploaded, setFileUploaded] = useState(false); // track file upload state; initially set it to false
   const [isLoading, setIsLoading] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [fileName, setFileName] = useState("");
+  const [errorPopupData, setErrorPopupData] = useState(null);
 
   useEffect(() => {
     const storedFileName = localStorage.getItem("resumeFileName");
@@ -25,8 +28,24 @@ export default function ResumeReview() {
 
   const handleFileSelect = async (file) => {
     console.log("File selected:", file);
-    setFileName(file.name);
-    setIsLoading(true);
+    // Check if file is larger than 5MB
+    // Check if file is too large (>5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setFileUploaded(false);
+      setFileName("");
+      localStorage.removeItem("resumeFileDataUrl");
+      localStorage.removeItem("resumeFileName");
+      localStorage.removeItem("resumeData");
+
+      setErrorPopupData({
+        title: "File size exceeds limit",
+        message: "The maximum file size allowed is 5 MB. Please compress your file or upload a smaller version.",
+        fileName: file.name,
+        fileSize: (file.size / (1024 * 1024)).toFixed(2) + " MB"
+      });
+
+      return; // stop execution
+    }
     
     // Simulate progress updates - in production, you'd get real progress from API if available
     const progressInterval = setInterval(() => {
@@ -59,6 +78,24 @@ export default function ResumeReview() {
       const formattedData = interpretData(resumeData);
       console.log("Here is the formatted data:");
       console.log(formattedData);
+
+      if (!isValidResume(formattedData)) {
+              setFileUploaded(false);
+              setFileName("");
+              localStorage.removeItem("resumeFileDataUrl");
+              localStorage.removeItem("resumeFileName");
+              localStorage.removeItem("resumeData");
+            
+              setErrorPopupData({
+                title: "Invalid Resume",
+                message: "This doesn't look like a proper resume. Please upload a resume with education, work experience, or skills.",
+                fileName: file.name
+              });
+            
+              setIsLoading(false);
+              setProcessingProgress(0);
+              return;
+            }
 
       // Store the resume data in localStorage
       localStorage.setItem("resumeData", JSON.stringify(formattedData));
@@ -269,6 +306,15 @@ function interpretData(data){
           </main>
         </div>
       </section>
+      {errorPopupData && (
+        <ErrorPopup
+          title={errorPopupData.title}
+          message={errorPopupData.message}
+          fileName={errorPopupData.fileName}
+          fileSize={errorPopupData.fileSize}
+          onClose={() => setErrorPopupData(null)}
+        />
+      )}
     </div>
   );
 }
