@@ -1,33 +1,29 @@
 "use client"; {/* Error popups if this is not here */}
-import React, { useState } from 'react'; // Add the useState import
+import React, { useState, useEffect } from 'react'; // Add the useState import
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
 import MockInterviewProgressBar from '@/components/MockInterviewProgressBar';
 
 export default function ResumeReview() {
+  useEffect(() => {
+    const savedListing = localStorage.getItem("jobListingData");
+    if (savedListing) {
+      setText(savedListing);
+    }
+  }, []);
+
   const [text, setText] = useState(""); 
 
     async function handleSubmit(){
       console.log("user typed:", text);
-      localStorage.setItem("mockInterviewInput", text); // store this in local storage
+      localStorage.setItem("jobListingData", text); // store this in local storage
       try {
-        const response = await fetch("/api/openai-mock-interview", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(text),
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-    
-        const result = await response.json();
-        console.log("Server Response:", result);
+        // Save the job listing text in localStorage
+        localStorage.setItem("jobListingData", text);
+        console.log("Job listing saved to localStorage");
       } catch (error) {
-        console.error("Error calling OpenAI route:", error);
+        console.error("Error saving job listing to localStorage:", error);
       }
 
     }

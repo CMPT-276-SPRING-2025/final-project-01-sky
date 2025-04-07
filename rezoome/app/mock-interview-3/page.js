@@ -9,7 +9,6 @@ let currQuestion = 0;
 let questionList;
 let hasFetched = false;
 
-
 export default function InterviewPage() {
   // State to manage recording status
   const [isRecording, setIsRecording] = useState(false);
@@ -30,38 +29,51 @@ export default function InterviewPage() {
       .catch((err) => console.error("Error accessing media:", err)); //Log errors
   }, []); // This effect runs once when the component mounts
 
-  useEffect( () => {
-    
-    // Fetch interview questions from the API
+  useEffect(() => {
     async function fetchQuestions() {
-      if(hasFetched !== true){
-        hasFetched = true
-        try {
-          const response = await fetch("/api/openai-mock-interview");
-          if (!response.ok) {
-            const text = await response.text(); // fallback for non-JSON error bodies
-            throw new Error(`Fetch failed: ${text}`);
-          }
-          const data = await response.json();
-          console.log("Interview questions:", data.questions);
-    
-          const questionsArr = data.questions.split('|');
-          const questionElement = document.getElementById("questionText");
-          if (questionElement && questionsArr.length > 0) {
-            questionElement.textContent = questionsArr[0].trim();
-          }
-          questionList = questionsArr
-        } catch (error) {
-          console.error("Error fetching questions:", error);
+      if (hasFetched) return;
+      hasFetched = true;
+  
+      try {
+        // Retrieve resume and listing from localStorage
+        const resume = JSON.parse(localStorage.getItem("mockInterviewResume"));
+        const listing = localStorage.getItem("mockInterviewInput");
+  
+        if (!resume || !listing) {
+          throw new Error("Missing resume or job listing in localStorage");
         }
+  
+        // POST them to your updated backend route
+        const response = await fetch("/api/openai-mock-interview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ resume, listing }),
+        });
+  
+        if (!response.ok) {
+          const text = await response.text(); // fallback for non-JSON error bodies
+          throw new Error(`Fetch failed: ${text}`);
+        }
+  
+        const data = await response.json();
+        console.log("Interview questions:", data.questions);
+  
+        const questionsArr = data.questions.split('|');
+        const questionElement = document.getElementById("questionText");
+  
+        if (questionElement && questionsArr.length > 0) {
+          questionElement.textContent = questionsArr[0].trim();
+        }
+  
+        questionList = questionsArr;
+      } catch (error) {
+        console.error("Error fetching questions:", error);
       }
-
     }
-
   
     fetchQuestions();
-
-
   }, []);
 
   function nextQuestion(){
