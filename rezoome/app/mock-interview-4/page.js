@@ -9,6 +9,7 @@ export default function MockInterviewFeedback() {
   const [resumeFileName, setResumeFileName] = useState("Your Resume");
   const [jobListing, setJobListing] = useState("Job posting text goes here...");
   const [feedbackPoints, setFeedbackPoints] = useState([]);
+  const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const handleResumeDownload = () => {
@@ -32,7 +33,9 @@ export default function MockInterviewFeedback() {
     if (storedResumeFile) setResumeFileUrl(storedResumeFile);
     if (storedResumeName) setResumeFileName(storedResumeName);
 
-    if (!storedResponses) {
+    if (storedResponses) {
+      setResponses(JSON.parse(storedResponses));
+    } else {
       setFeedbackPoints(["Missing responses. Please redo the interview."]);
       setLoading(false);
       return;
@@ -45,34 +48,28 @@ export default function MockInterviewFeedback() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ responses: JSON.parse(storedResponses) }),
         });
-    
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error("Response error text:", errorText);
           throw new Error(errorText);
         }
-    
+
         const json = await response.json();
-        console.log("💬 Raw feedback response from API:", json);
-    
         if (json.feedback && typeof json.feedback === "object") {
-          const ordered = ["q1", "q2", "q3", "q4"].map(
-            (key) => json.feedback[key] || "No feedback."
-          );
-          console.log("✅ Parsed feedback array:", ordered);
+          const ordered = ["q1", "q2", "q3", "q4"].map((key) => json.feedback[key] || "No feedback.");
           setFeedbackPoints(ordered);
         } else {
           throw new Error("Invalid feedback format");
         }
-    
+
       } catch (err) {
-        console.error("❌ Error fetching feedback:", err);
+        console.error("Error fetching feedback:", err);
         setFeedbackPoints(["Something went wrong. Please try again."]);
       } finally {
         setLoading(false);
       }
     }
-    
 
     fetchFeedback();
   }, []);
@@ -87,9 +84,9 @@ export default function MockInterviewFeedback() {
         </p>
       </div>
 
-      <section className="bg-[var(--secondary-colour)] pb-75 pt-10">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 px-8">
-          {/* Left Column */}
+      <section className="bg-[var(--secondary-colour)] pb-20 pt-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10 px-8">
+          {/* Resume Column */}
           <div className="flex flex-col gap-6">
             {/* Resume Download */}
             <div>
@@ -107,12 +104,14 @@ export default function MockInterviewFeedback() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Job Posting Section */}
+          {/* Job Posting Column */}
+          <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-lg font-bold mb-2">Job Posting</h2>
-              <div className="bg-white rounded-lg shadow-lg">
-                <div className="border border-gray-200 rounded-lg p-4 h-36 overflow-y-auto">
+              <div className="bg-white rounded-lg shadow-lg h-36">
+                <div className="border border-gray-200 rounded-lg p-4 h-full overflow-y-auto">
                   <p className="text-gray-600 whitespace-pre-line text-sm">
                     {jobListing || "No job posting available."}
                   </p>
@@ -120,51 +119,32 @@ export default function MockInterviewFeedback() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Right Column */}
-          <div className="flex flex-col gap-6">
-
-          {/* Feedback Box */}
-          <div>
-            <h2 className="text-lg font-bold mb-2">Feedback</h2>
-            <div className="bg-white rounded-lg shadow-lg">
-              <div className="border border-gray-200 rounded-lg p-6 h-48 overflow-y-auto">
-                {loading ? (
-                  <p className="text-gray-500 italic">Loading feedback...</p>
-                ) : feedbackPoints && typeof feedbackPoints === 'object' ? (
-                  <p className="text-gray-600 whitespace-pre-line">
-                    Here’s how you can improve your mock interview answers based on each response.
-                  </p>
-                ) : (
-                  <p className="italic text-gray-500">No feedback available.</p>
-                )}
-              </div>
+        {/* Suggestions / Main Feedback Section */}
+        <div className="max-w-5xl mx-auto px-8">
+          <h2 className="text-xl font-bold mb-4">Suggestions</h2>
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="border border-gray-200 rounded-lg p-6 space-y-6">
+              {loading ? (
+                <p className="text-gray-500 italic">Loading suggestions...</p>
+              ) : (
+                feedbackPoints.map((feedback, index) => (
+                  <div key={index} className="bg-gray-50 border rounded-md p-4 space-y-2">
+                    <p className="text-gray-800 text-sm">
+                      <span className="font-bold">Question {index + 1}:</span>
+                    </p>
+                    <p className="text-gray-700 text-sm ml-2 italic">
+                      {responses[index] ? responses[index] : "No response recorded."}
+                    </p>
+                    <p className="text-sm text-black mt-2 bg-yellow-100 px-3 py-2 rounded font-medium">
+                      <span className="font-semibold">Feedback:</span> {feedback}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-
-          {/* Suggestions Box */}
-          <div>
-            <h2 className="text-lg font-bold mb-2">Suggestions</h2>
-            <div className="bg-white rounded-lg shadow-lg">
-              <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
-                {loading ? (
-                  <p className="text-gray-500 italic">Loading suggestions...</p>
-                ) : feedbackPoints && typeof feedbackPoints === 'object' ? (
-                  <ul className="list-disc pl-5 text-gray-600 space-y-3">
-                    {["q1", "q2", "q3", "q4"].map((key, i) => (
-                      <li key={key}>
-                        <span className="font-semibold">Question {i + 1}:</span> {feedbackPoints[key]}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="italic text-gray-500">No suggestions available.</p>
-                )}
-              </div>
-            </div>
-          </div>
-          </div>
-
         </div>
 
         {/* Navigation */}

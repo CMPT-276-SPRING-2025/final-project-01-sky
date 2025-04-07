@@ -103,7 +103,8 @@ export default function InterviewPage() {
             "thanks for watching",
             "see you next time",
             "goodbye",
-            "the end"
+            "the end",
+            "i'll see you tomorrow."
           ];
 
           if (
