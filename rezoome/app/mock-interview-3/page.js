@@ -3,6 +3,9 @@ import { useState, useRef, useEffect } from "react";
 import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
+import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
+
+let hasFetched = false;
 
 export default function InterviewPage() {
   const [questionList, setQuestionList] = useState([]);
@@ -22,17 +25,35 @@ export default function InterviewPage() {
           videoRef.current.srcObject = stream;
         }
       })
-      .catch((err) => console.error("Error accessing video:", err));
+      .catch((err) => console.error("Error accessing media:", err));
   }, []);
 
   useEffect(() => {
     async function fetchQuestions() {
+      if (hasFetched) return;
+      hasFetched = true;
+
       try {
-        const response = await fetch("/api/openai-mock-interview");
+        const resume = JSON.parse(localStorage.getItem("mockInterviewResume"));
+        const listing = localStorage.getItem("mockInterviewInput");
+
+        if (!resume || !listing) {
+          throw new Error("Missing resume or job listing in localStorage");
+        }
+
+        const response = await fetch("/api/openai-mock-interview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ resume, listing }),
+        });
+
         if (!response.ok) {
           const text = await response.text();
           throw new Error(`Fetch failed: ${text}`);
         }
+
         const data = await response.json();
         const questionsArr = data.questions.split('|').map(q => q.trim());
         setQuestionList(questionsArr);
@@ -104,7 +125,6 @@ export default function InterviewPage() {
           newResponses[currentQuestionIndex] = cleanText;
           setResponses(newResponses);
           localStorage.setItem("mockInterviewResponses", JSON.stringify(newResponses));
-
         } catch (err) {
           console.error("Whisper error:", err);
         } finally {
