@@ -17,7 +17,7 @@ function isValidResume(resume) {
       ? resume.skills.filter(skill => typeof skill === "string" && skill.trim() !== "")
       : [];
   
-    // valid if ther is at least one of these sections filled out with the name
+    // valid if there is at least one of these sections filled out with the name
     return (
       education.length > 0 ||
       workExperience.length > 0 ||
