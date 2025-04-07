@@ -1,6 +1,6 @@
 "use client"; {/* Error popups if this is not here */}
 import Link from "next/link";
-import React, { useState } from 'react'; // Add the useState import
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import FileUpload from "../../components/FileUpload";
 import '../globals.css';
@@ -12,6 +12,16 @@ export default function ResumeReview() {
   const [isLoading, setIsLoading] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [fileName, setFileName] = useState("");
+
+  useEffect(() => {
+    const storedFileName = localStorage.getItem("resumeFileName");
+    const storedResumeData = localStorage.getItem("mockInterviewResume");
+  
+    if (storedFileName && storedResumeData) {
+      setFileName(storedFileName);
+      setFileUploaded(true);
+    }
+  }, []);
 
   const handleFileSelect = async (file) => {
     console.log("File selected:", file);
@@ -29,6 +39,12 @@ export default function ResumeReview() {
       });
     }, 500);
     
+    // Convert file to data URL for display later
+    const fileDataUrl = await fileToDataURL(file);
+    localStorage.setItem("resumeFileDataUrl", fileDataUrl);
+    localStorage.setItem("resumeFileName", file.name);
+
+
     // handle the selected file
     const rawData = await uploadFile(file);
     
@@ -43,6 +59,9 @@ export default function ResumeReview() {
       const formattedData = interpretData(resumeData);
       console.log("Here is the formatted data:");
       console.log(formattedData);
+
+      // Store the resume data in localStorage
+      localStorage.setItem("resumeData", JSON.stringify(formattedData));
       
       try {
         // Save the formatted data JSON in localStorage
@@ -98,6 +117,15 @@ function fileToBase64(file) {
         reader.onerror = (error) => reject(error);
     });
 }
+  // Function to convert file to data URL for storage
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
 
 //Takes in the raw data JSON and returns it formatted
 function interpretData(data){
