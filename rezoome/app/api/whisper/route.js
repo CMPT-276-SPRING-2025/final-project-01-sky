@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import fs from "fs";
 import { writeFile } from "fs/promises";
 import path from "path";
+import os from "os";
 
 // Init OpenAI
 const openai = new OpenAI({
@@ -25,7 +26,8 @@ export async function POST(req) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `recording-${Date.now()}.webm`;
-    const tempPath = path.join("/tmp", fileName);
+    const tempPath = path.join(os.tmpdir(), fileName);
+
 
     await writeFile(tempPath, buffer);
 
