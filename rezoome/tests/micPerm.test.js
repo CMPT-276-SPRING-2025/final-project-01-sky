@@ -1,6 +1,13 @@
 const { requestMicAccess } = require('../utils/requestMic');
 
 describe('requestMicAccess', () => {
+
+  beforeEach(() => {
+    // Make sure global.navigator exists before assigning mediaDevices
+    if (!global.navigator) {
+      global.navigator = {};
+    }
+  });
   // user allows mic access
   it('returns granted: true when mic is allowed', async () => {
     const mockStream = { id: '123' };
