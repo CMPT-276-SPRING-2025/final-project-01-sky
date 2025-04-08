@@ -46,8 +46,9 @@ export default function InterviewPage() {
         hasFetched = true;
 
         try {
-          const resume = JSON.parse(localStorage.getItem("mockInterviewResume"));
-          const listing = localStorage.getItem("mockInterviewInput");
+          const resume = JSON.parse(localStorage.getItem("resumeData"));
+          const listing = localStorage.getItem("jobListingData");
+
 
           if (!resume || !listing) {
             throw new Error("Missing resume or job listing in localStorage");
@@ -153,6 +154,16 @@ export default function InterviewPage() {
     }
   };
 
+  // ✅ Consider valid only if the response is not null, not empty, not whitespace, and not "unintelligible" or "no response"
+  const hasValidAnswer = responses.some(
+    (response) =>
+      response &&
+      response.trim() !== "" &&
+      response.toLowerCase() !== "no response" &&
+      response.toLowerCase() !== "unintelligible"
+  );
+
+  
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
@@ -244,14 +255,18 @@ export default function InterviewPage() {
             Go Back
           </Button>
           <Button
-            color="black"
-            href="/mock-interview-4"
-            className="w-auto px-6 py-2"
-          >
-            Next
-          </Button>
+          color="black"
+          href="/mock-interview-4"
+          className={`w-auto px-6 py-2 ${
+            !hasValidAnswer ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
+        >
+          Next
+        </Button>
+
         </div>
       </section>
+
 
 
     </div>

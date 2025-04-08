@@ -27,98 +27,89 @@ export default function ResumeReview() {
   }, []);
 
   const handleFileSelect = async (file) => {
-    console.log("File selected:", file);
-    // Check if file is larger than 5MB
-    // Check if file is too large (>5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setFileUploaded(false);
-      setFileName("");
-      localStorage.removeItem("resumeFileDataUrl");
-      localStorage.removeItem("resumeFileName");
-      localStorage.removeItem("resumeData");
+  console.log("File selected:", file);
 
-      setErrorPopupData({
-        title: "File size exceeds limit",
-        message: "The maximum file size allowed is 5 MB. Please compress your file or upload a smaller version.",
-        fileName: file.name,
-        fileSize: (file.size / (1024 * 1024)).toFixed(2) + " MB"
-      });
+  // 🧹 Clean up previous session data except job listing
+  localStorage.removeItem("resumeFileDataUrl");
+  localStorage.removeItem("resumeFileName");
+  localStorage.removeItem("resumeData");
+  localStorage.removeItem("mockInterviewResume");
+  localStorage.removeItem("mockInterviewQuestions");
+  localStorage.removeItem("mockInterviewResponses");
 
-      return; // stop execution
-    }
-    
-    // Simulate progress updates - in production, you'd get real progress from API if available
-    const progressInterval = setInterval(() => {
-      setProcessingProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90; // Cap at 90% until actual completion
-        }
-        return prev + 10;
-      });
-    }, 500);
-    
-    // Convert file to data URL for display later
+  setFileUploaded(false);
+  setFileName("");
+  setIsLoading(true);
+
+  // Handle file too large
+  if (file.size > 5 * 1024 * 1024) {
+    setErrorPopupData({
+      title: "File size exceeds limit",
+      message: "The maximum file size allowed is 5 MB. Please compress your file or upload a smaller version.",
+      fileName: file.name,
+      fileSize: (file.size / (1024 * 1024)).toFixed(2) + " MB"
+    });
+    setIsLoading(false);
+    return;
+  }
+
+  const progressInterval = setInterval(() => {
+    setProcessingProgress((prev) => {
+      if (prev >= 90) {
+        clearInterval(progressInterval);
+        return 90;
+      }
+      return prev + 10;
+    });
+  }, 500);
+
+  try {
     const fileDataUrl = await fileToDataURL(file);
     localStorage.setItem("resumeFileDataUrl", fileDataUrl);
     localStorage.setItem("resumeFileName", file.name);
 
-
-    // handle the selected file
     const rawData = await uploadFile(file);
-    
-    // Clear the interval regardless of the result
     clearInterval(progressInterval);
-    
-    if(rawData.success === true){
-      setProcessingProgress(100); // Set to 100% when complete
-      
-      const resumeData = rawData.data.data;
-      console.log("Interperting data");
-      const formattedData = interpretData(resumeData);
-      console.log("Here is the formatted data:");
-      console.log(formattedData);
 
-      if (!isValidResume(formattedData)) {
-              setFileUploaded(false);
-              setFileName("");
-              localStorage.removeItem("resumeFileDataUrl");
-              localStorage.removeItem("resumeFileName");
-              localStorage.removeItem("resumeData");
-            
-              setErrorPopupData({
-                title: "Invalid Resume",
-                message: "This doesn't look like a proper resume. Please upload a resume with education, work experience, or skills.",
-                fileName: file.name
-              });
-            
-              setIsLoading(false);
-              setProcessingProgress(0);
-              return;
-            }
+    if (rawData.success !== true) {
+      throw new Error("Data not readable");
+    }
 
-      // Store the resume data in localStorage
-      localStorage.setItem("resumeData", JSON.stringify(formattedData));
-      
-      try {
-        // Save the formatted data JSON in localStorage
-        localStorage.setItem("mockInterviewResume", JSON.stringify(formattedData));
-        console.log("Resume data saved to localStorage");
-      
-        // Simulate successful completion
-        setFileUploaded(true);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error saving formatted data to localStorage:", error);
-        setIsLoading(false);
-      }
+    setProcessingProgress(100);
+
+    const resumeData = rawData.data.data;
+    const formattedData = interpretData(resumeData);
+
+    if (!isValidResume(formattedData)) {
+      throw new Error("Invalid resume content");
     }
-    else{
-      console.log("Data is not readable");
-      setIsLoading(false);
-      setProcessingProgress(0); // Reset progress on error
-    }
-  };
+
+    localStorage.setItem("resumeData", JSON.stringify(formattedData));
+    localStorage.setItem("mockInterviewResume", JSON.stringify(formattedData));
+
+    setFileUploaded(true);
+    setFileName(file.name);
+  } catch (err) {
+    console.error("Error processing file:", err);
+
+    setErrorPopupData({
+      title: "Upload Error",
+      message: err.message || "An unexpected error occurred.",
+      fileName: file.name
+    });
+
+    // Clean up only the resume data — job listing stays
+    localStorage.removeItem("resumeFileDataUrl");
+    localStorage.removeItem("resumeFileName");
+    localStorage.removeItem("resumeData");
+    localStorage.removeItem("mockInterviewResume");
+    localStorage.removeItem("mockInterviewQuestions");
+    localStorage.removeItem("mockInterviewResponses");
+  } finally {
+    setIsLoading(false);
+    clearInterval(progressInterval);
+  }
+};
 
   //Takes in the file object and runs it to the Affinda API returns JSON
   async function uploadFile(file) {

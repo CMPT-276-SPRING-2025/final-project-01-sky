@@ -52,16 +52,24 @@ export default function MockInterviewFeedback() {
       return;
     }
 
-    const progressInterval = setInterval(() => {
-      setProcessingProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 4.5;
-      });
-    }, 500);
+    let intervalId;
 
+    const startProgress = () => {
+      intervalId = setInterval(() => {
+        setProcessingProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(intervalId);
+            return 90;
+          }
+          return prev + 5;
+        });
+      }, 500);
+    };
+
+    startProgress();
+
+
+    
     async function fetchFeedback() {
       try {
         const response = await fetch("/api/openai-mock-feedback", {
@@ -87,11 +95,14 @@ export default function MockInterviewFeedback() {
         console.error("Error fetching feedback:", err);
         setError("Something went wrong. Please try again.");
       } finally {
-        clearInterval(progressInterval);
+        clearInterval(intervalId);
         setProcessingProgress(100);
+
+        // Short delay for visual finish
         setTimeout(() => {
           setLoading(false);
-        }, 500);
+        }, 600);
+
       }
     }
 
