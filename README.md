@@ -79,7 +79,7 @@ Then open your browser and go to:
 ### **6. Run Tests (Optional)**  
 To run Jest tests:  
 ```bash
-npm run test
+npm test
 ```
 
 
