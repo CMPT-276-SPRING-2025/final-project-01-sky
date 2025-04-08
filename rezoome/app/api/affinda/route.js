@@ -168,37 +168,6 @@ async function indexAffindaDocument(documentId) {
   }
 }
 
-// async function addResumeToIndex(documentId, indexName = "Resume-Search-Demo") {
-//     const API_KEY = process.env.AFFINDA_API_KEY;
-//     const apiUrl = "https://api.affinda.com/v3/indexes/resumes";
-  
-//     try {
-//       const response = await fetch(apiUrl, {
-//         method: "POST",
-//         headers: {
-//           "Authorization": `Bearer ${API_KEY}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           identifier: indexName,
-//           resume_identifiers: [documentId]
-//         }),
-//       });
-  
-//       if (!response.ok) {
-//         const errorText = await response.text();
-//         console.error("Error adding resume to index:", errorText);
-//         throw new Error(`Failed to add resume to index: ${response.status}`);
-//       }
-  
-//       const data = await response.json();
-//       console.log("Resume added to index successfully:", data);
-//       return data;
-//     } catch (error) {
-//       console.error("Error adding resume to index:", error);
-//       throw error;
-//     }
-//   }
   
 async function isDocumentIndexed(documentId) {
   const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
