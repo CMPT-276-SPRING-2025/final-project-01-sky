@@ -5,6 +5,8 @@ import '../globals.css';
 import Button from '@/components/Button';
 import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
 import ErrorPopup from "@/components/ErrorPopup";
+import { isMicSilent } from '@/utils/isMicSilent';
+
 
 let hasFetched = false;
 
@@ -16,6 +18,10 @@ export default function InterviewPage() {
   const [responses, setResponses] = useState([null, null, null, null]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [showMicError, setShowMicError] = useState(false);
+  const silenceTimerRef = useRef(null);
+  const [showMicPermissionError, setShowMicPermissionError] = useState(false);
+
 
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -85,69 +91,94 @@ export default function InterviewPage() {
 
   const recordAnswerChunk = async () => {
     if (!isAnswering) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-      mediaRecorderRef.current = recorder;
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+        mediaRecorderRef.current = recorder;
 
-      let chunks = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
+        let chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+            dataReceived = true;
+          }
+        };
 
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: "audio/webm" });
-        const formData = new FormData();
-        formData.append("file", audioBlob, "chunk.webm");
+        recorder.onstop = async () => {
+          const audioBlob = new Blob(chunks, { type: "audio/webm" });
 
-        setIsProcessing(true);
-        try {
-          const res = await fetch("/api/whisper", {
-            method: "POST",
-            body: formData,
-          });
-          const json = await res.json();
-          let cleanText = (json.transcription || "").trim().toLowerCase();
-
-          const hallucinationPhrases = [
-            "bye bye",
-            "thank you for watching",
-            "thank you.",
-            "thanks for watching",
-            "see you next time",
-            "goodbye",
-            "the end",
-            "i'll see you tomorrow."
-          ];
-
-          if (
-            !cleanText ||
-            cleanText.length < 5 ||
-            hallucinationPhrases.includes(cleanText) ||
-            /^[\W\d\s]+$/.test(cleanText)
-          ) {
-            cleanText = "No response";
-          } else {
-            const englishLetters = cleanText.match(/[a-zA-Z]/g) || [];
-            const density = englishLetters.length / cleanText.length;
-            if (density < 0.7) {
-              cleanText = "Unintelligible";
-            }
+          if (isMicSilent(audioBlob)) {
+            setShowMicError(true);
+            setIsAnswering(false);
+            return;
           }
 
-          const newResponses = [...responses];
-          newResponses[currentQuestionIndex] = cleanText;
-          setResponses(newResponses);
-          localStorage.setItem("mockInterviewResponses", JSON.stringify(newResponses));
-        } catch (err) {
-          console.error("Whisper error:", err);
-        } finally {
-          setIsProcessing(false);
-          setIsAnswering(false);
-        }
-      };
+          const formData = new FormData();
+          formData.append("file", audioBlob, "chunk.webm");
 
-      recorder.start();
-      setIsAnswering(true);
+          setIsProcessing(true);
+          try {
+            const res = await fetch("/api/whisper", {
+              method: "POST",
+              body: formData,
+            });
+            const json = await res.json();
+            let cleanText = (json.transcription || "").trim().toLowerCase();
+
+            const hallucinationPhrases = [
+              "bye bye",
+              "thank you for watching",
+              "thank you.",
+              "thanks for watching",
+              "see you next time",
+              "goodbye",
+              "the end",
+              "i'll see you tomorrow."
+            ];
+
+            if (
+              !cleanText ||
+              cleanText.length < 5 ||
+              hallucinationPhrases.includes(cleanText) ||
+              /^[\W\d\s]+$/.test(cleanText)
+            ) {
+              cleanText = "No response";
+            } else {
+              const englishLetters = cleanText.match(/[a-zA-Z]/g) || [];
+              const density = englishLetters.length / cleanText.length;
+              if (density < 0.7) {
+                cleanText = "Unintelligible";
+              }
+            }
+
+            const newResponses = [...responses];
+            newResponses[currentQuestionIndex] = cleanText;
+            setResponses(newResponses);
+            localStorage.setItem("mockInterviewResponses", JSON.stringify(newResponses));
+          } catch (err) {
+            console.error("Whisper error:", err);
+          } finally {
+            setIsProcessing(false);
+            setIsAnswering(false);
+          }
+        };
+
+        recorder.start();
+        setIsAnswering(true);
+
+        silenceTimerRef.current = setTimeout(() => {
+          if (!dataReceived) {
+            recorder.stop();
+          }
+        }, 5000);
+      } catch (error) {
+        console.error("Error accessing media:", error);
+        if (error.name === "NotAllowedError") {
+          setShowMicPermissionError(true); // 👈 show custom mic permission popup
+        } else {
+          setShowMicError(true); // fallback for other errors
+        }
+      }
     } else {
       mediaRecorderRef.current?.stop();
     }
@@ -271,6 +302,31 @@ export default function InterviewPage() {
           cancelText="Go Back"
         />
       )}
+
+    {showMicError && (
+      <ErrorPopup
+        title="We arn't detecting any sound!"
+        message="We didn't detect any sound after 5 seconds. Is your mic plugged in and working?"
+        onClose={() => setShowMicError(false)}
+        onConfirm={() => {
+          setShowMicError(false);
+          recordAnswerChunk(); // Optionally retry
+        }}
+        buttonText="Try Again"
+        cancelText="Cancel"
+      />
+    )}
+
+    {showMicPermissionError && (
+      <ErrorPopup
+        title="We couldn't access your microphone"
+        message="It looks like you denied microphone access. Please allow it in your browser settings to continue."
+        onClose={() => setShowMicPermissionError(false)}
+        onConfirm={() => setShowMicPermissionError(false)}
+        buttonText="OK"
+        cancelText="Cancel"
+      />
+    )}
 
 
     </div>
