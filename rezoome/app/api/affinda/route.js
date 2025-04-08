@@ -137,39 +137,106 @@ async function uploadJobDescription(base64File) {
 }
 
 
-async function addResumeToIndex(documentId, indexName = "Resume-Search-Demo") {
-    const API_KEY = process.env.AFFINDA_API_KEY;
-    const apiUrl = "https://api.affinda.com/v3/indexes/resumes";
-  
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          identifier: indexName,
-          resume_identifiers: [documentId]
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error adding resume to index:", errorText);
-        throw new Error(`Failed to add resume to index: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log("Resume added to index successfully:", data);
-      return data;
-    } catch (error) {
-      console.error("Error adding resume to index:", error);
-      throw error;
-    }
+async function indexAffindaDocument(documentId) {
+  const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
+  if (!documentId) {
+    throw new Error('Document ID is required');
   }
   
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      authorization: `Bearer ${API_KEY}`
+    },
+    body: JSON.stringify({ document: documentId })
+  };
   
+  try {
+    const response = await fetch('https://api.affinda.com/v3/index/search/documents', options);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Affinda API error: ${JSON.stringify(errorData)}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error indexing document:', error);
+    throw error;
+  }
+}
+
+// async function addResumeToIndex(documentId, indexName = "Resume-Search-Demo") {
+//     const API_KEY = process.env.AFFINDA_API_KEY;
+//     const apiUrl = "https://api.affinda.com/v3/indexes/resumes";
+  
+//     try {
+//       const response = await fetch(apiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Authorization": `Bearer ${API_KEY}`,
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           identifier: indexName,
+//           resume_identifiers: [documentId]
+//         }),
+//       });
+  
+//       if (!response.ok) {
+//         const errorText = await response.text();
+//         console.error("Error adding resume to index:", errorText);
+//         throw new Error(`Failed to add resume to index: ${response.status}`);
+//       }
+  
+//       const data = await response.json();
+//       console.log("Resume added to index successfully:", data);
+//       return data;
+//     } catch (error) {
+//       console.error("Error adding resume to index:", error);
+//       throw error;
+//     }
+//   }
+  
+async function isDocumentIndexed(documentId) {
+  const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
+  if (!documentId) {
+    throw new Error('Document ID is required');
+  }
+  
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      authorization: `Bearer ${API_KEY}`
+    }
+  };
+  
+  try {
+    // First, check if the document exists
+    const documentResponse = await fetch(`https://api.affinda.com/v3/documents/${documentId}`, options);
+    
+    if (!documentResponse.ok) {
+      if (documentResponse.status === 404) {
+        return false; // Document doesn't exist
+      }
+      const errorData = await documentResponse.json();
+      throw new Error(`Affinda API error checking document: ${JSON.stringify(errorData)}`);
+    }
+    
+    // Next, check if the document is in the search index
+    const indexResponse = await fetch(`https://api.affinda.com/v3/index/search/documents/${documentId}`, options);
+    
+    // If we get a 200 response, the document is indexed
+    return indexResponse.ok;
+    
+  } catch (error) {
+    console.error('Error checking document index status:', error);
+    throw error;
+  }
+}
 
 // Corrected getMatchScore function that follows Affinda API docs
 async function getMatchScore(documentId, jobDescription) {
@@ -185,6 +252,10 @@ async function getMatchScore(documentId, jobDescription) {
         
         const url = new URL(apiUrl);
         // Add parameters
+        if(!isDocumentIndexed(documentId)){
+          await indexAffindaDocument(documentId);
+        }
+        
         url.searchParams.append('resume', documentId);
         let jobDocument = await uploadJobDescription(jobDescription);
         let jobIdentifier = jobDocument?.meta?.identifier;
