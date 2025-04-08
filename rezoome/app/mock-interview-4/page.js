@@ -113,9 +113,9 @@ export default function MockInterviewFeedback() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
       <div className="text-center pt-20 pb-5">
-        <h1 className="text-5xl font-bold text-black">Mock Interview Feedback</h1>
+        <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-          Here's your feedback and suggestions based on your interview performance.
+          Review the provided feedback and suggestions to improve your interview performance for your targeted job.
         </p>
       </div>
 
@@ -124,7 +124,7 @@ export default function MockInterviewFeedback() {
       <section className="bg-[var(--secondary-colour)] pb-20 pt-10">
         {loading ? (
           <div className="max-w-5xl mx-auto px-8 py-5 pb-16">
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+            <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
               <p className="text-lg font-medium text-gray-700 mb-2">
                 Analyzing your interview performance...
               </p>
@@ -184,7 +184,7 @@ export default function MockInterviewFeedback() {
 
             {/* General Feedback */}
             <div className="max-w-5xl mx-auto px-8 mb-6">
-              <h2 className="text-2xl font-bold mb-4 text-black">General Feedback</h2>
+              <h2 className="text-lg font-bold mb-2">General Feedback</h2>
               <div className="bg-white rounded-lg shadow-lg">
                 <div className="border border-gray-200 rounded-lg p-6 max-h-[200px] overflow-y-auto">
                   <p className="text-gray-800 whitespace-pre-line text-lg">{generalFeedback}</p>
@@ -194,8 +194,8 @@ export default function MockInterviewFeedback() {
 
             {/* Suggestions */}
             <div className="max-w-5xl mx-auto px-8">
-              <h2 className="text-2xl font-bold mb-4 text-black">Suggestions</h2>
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <h2 className="text-lg font-bold mb-2">Suggestions</h2>
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-10">
                 <div className="border border-gray-200 rounded-lg p-6 space-y-6">
                   {feedbackPoints.map((feedback, index) => (
                     <div key={index} className="bg-white border border-gray-300 rounded-md p-4 shadow-sm">

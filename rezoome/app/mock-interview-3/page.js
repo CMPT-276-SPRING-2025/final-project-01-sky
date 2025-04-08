@@ -200,34 +200,34 @@ export default function InterviewPage() {
       <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-          Press answer question to record answer then hit next question.
+          Press the "Answer Question" button to record answer, then hit the "Next Question".
         </p>
       </div>
       <MockInterviewProgressBar currentStep={3} />
 
+      <div className="bg-[var(--secondary-colour)] pt-6 pb-35 w-full">
       {/* Question Card */}
       <section className="bg-[var(--secondary-colour)] py-6 text-center w-full">
-        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md min-h-[260px] flex flex-col justify-center">
-          <p className="text-gray-500 text-sm">Question {currentQuestionIndex + 1}</p>
+        <div className="w-full max-w-[980px] mx-auto bg-white p-6 rounded-xl shadow-md min-h-[200px] flex flex-col justify-center">
+          <p className="text-gray-500 text-sm">   Question {currentQuestionIndex + 1} <span className="">({currentQuestionIndex + 1}/4)</span>
+          </p>
           <h2 className="text-lg font-semibold mt-1">
             {loadingQuestions ? <span className="text-xl">Loading...</span> : currentQuestion || "No question available."}
           </h2>
-          <p className="text-gray-400 text-sm mt-1">{`${currentQuestionIndex + 1}/4`}</p>
           <p className="text-sm text-gray-600 mt-2">
             <span className="font-semibold">Your Answer:</span>{" "}
             {currentAnswer || "Click 'Answer Question' to begin."}
           </p>
-        </div>
 
-        {/* Question Navigation */}
-        <div className="flex justify-between items-center max-w-2xl mx-auto px-4 mt-4">
+          {/* Question Navigation */}
+        <div className="flex justify-between items-center w-full mx-auto px-4">
           <button
             onClick={() => setCurrentQuestionIndex((prev) => (prev > 0 ? prev - 1 : 0))}
             disabled={currentQuestionIndex === 0}
-            className={`px-6 py-3 rounded-full font-medium transition ${
+            className={`px-6 py-3 rounded-lg font-medium transition ${
               currentQuestionIndex === 0
                 ? "bg-gray-300 text-white opacity-50 cursor-not-allowed"
-                : "bg-gray-500 text-white hover:bg-gray-600"
+                : "bg-gray-500 text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
             }`}
           >
             Previous Question
@@ -238,25 +238,28 @@ export default function InterviewPage() {
               prev < questionList.length - 1 ? prev + 1 : prev
             )}
             disabled={currentQuestionIndex === questionList.length - 1}
-            className={`px-6 py-3 rounded-full font-medium transition ${
+            className={`px-6 py-3 rounded-lg font-medium transition ${
               currentQuestionIndex === questionList.length - 1
                 ? "bg-black text-white opacity-50 cursor-not-allowed"
-                : "bg-black text-white hover:bg-gray-800"
+                : "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
             }`}
           >
             Next Question
           </button>
         </div>
+        </div>
+
+        
       </section>
 
       {/* Video */}
-      <section className="flex flex-col items-center justify-center mt-8">
-        <div className="w-full max-w-[980px] h-[496px] bg-gray-300 rounded-xl relative overflow-hidden">
+      <section className="flex flex-col items-center justify-center bg-[var(--secondary-colour)]">
+        <div className="w-full max-w-[980px] h-[450px] bg-gray-300 rounded-xl relative overflow-hidden">
           <video ref={videoRef} autoPlay playsInline className="absolute w-full h-full object-cover" />
         </div>
 
         <button
-          className="mt-6 px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition"
+          className="mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-[var(--second-button-colour)] transition cursor-pointer"
           onClick={recordAnswerChunk}
           disabled={!currentQuestion || isProcessing || loadingQuestions}
         >
@@ -280,7 +283,7 @@ export default function InterviewPage() {
               }}
               className={`w-auto px-6 py-2 rounded-lg font-medium transition ${
                 hasAnsweredAtLeastOne
-                  ? "bg-black text-white hover:bg-gray-800"
+                  ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
                   : "bg-gray-400 text-gray-200 cursor-not-allowed opacity-50"
               }`}
               disabled={!hasAnsweredAtLeastOne}
@@ -289,6 +292,7 @@ export default function InterviewPage() {
             </button>
           </div>
         </section>
+        </div>
 
 
       {/* Confirm Popup */}

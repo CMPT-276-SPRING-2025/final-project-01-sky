@@ -64,7 +64,7 @@ export default function ResumeReview() {
       <MockInterviewProgressBar currentStep={2} />
 
       {/* Text input section */}
-      <section className="bg-[var(--secondary-colour)] pb-55">
+      <section className="bg-[var(--secondary-colour)] pb-35">
         <div className="text-center p-5">
           <main className="flex flex-col items-center gap-8 mt-8">
             

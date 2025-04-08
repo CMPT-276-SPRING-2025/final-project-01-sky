@@ -27,13 +27,13 @@ export default function ErrorPopup({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded hover:bg-[var(--second-button-colour)] transition hover:text-white"
+            className="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded hover:bg-[var(--second-button-colour)] transition hover:text-white cursor-pointer"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className="bg-black text-white text-sm px-4 py-2 rounded hover:bg-[var(--second-button-colour)] transition"
+            className="bg-black text-white text-sm px-4 py-2 rounded hover:bg-[var(--second-button-colour)] transition cursor-pointer"
           >
             {buttonText}
           </button>
