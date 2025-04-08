@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
 import MockInterviewProgressBar from "@/components/MockInterviewProgressBar";
+import ErrorPopup from "@/components/ErrorPopup";
 
 let hasFetched = false;
 
@@ -14,6 +15,7 @@ export default function InterviewPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [responses, setResponses] = useState([null, null, null, null]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
 
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -49,16 +51,13 @@ export default function InterviewPage() {
           const resume = JSON.parse(localStorage.getItem("resumeData"));
           const listing = localStorage.getItem("jobListingData");
 
-
           if (!resume || !listing) {
             throw new Error("Missing resume or job listing in localStorage");
           }
 
           const response = await fetch("/api/openai-mock-interview", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ resume, listing }),
           });
 
@@ -154,26 +153,27 @@ export default function InterviewPage() {
     }
   };
 
-  // ✅ Consider valid only if the response is not null, not empty, not whitespace, and not "unintelligible" or "no response"
-  const hasValidAnswer = responses.some(
-    (response) =>
-      response &&
-      response.trim() !== "" &&
-      response.toLowerCase() !== "no response" &&
-      response.toLowerCase() !== "unintelligible"
+  const validResponses = responses.filter(
+    (res) =>
+      res &&
+      res.trim() !== "" &&
+      res.toLowerCase() !== "no response" &&
+      res.toLowerCase() !== "unintelligible"
   );
+  const hasAnsweredAtLeastOne = validResponses.length > 0;
+  const allAnswered = validResponses.length === 4;
 
-  
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
       <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Mock Interview</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
-        Press answer question to record answer then hit next question.
+          Press answer question to record answer then hit next question.
         </p>
       </div>
       <MockInterviewProgressBar currentStep={3} />
+
       {/* Question Card */}
       <section className="bg-[var(--secondary-colour)] py-6 text-center w-full">
         <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md min-h-[260px] flex flex-col justify-center">
@@ -188,13 +188,10 @@ export default function InterviewPage() {
           </p>
         </div>
 
-        
-       {/* Question Navigation Buttons */}
+        {/* Question Navigation */}
         <div className="flex justify-between items-center max-w-2xl mx-auto px-4 mt-4">
           <button
-            onClick={() =>
-              setCurrentQuestionIndex((prev) => (prev > 0 ? prev - 1 : 0))
-            }
+            onClick={() => setCurrentQuestionIndex((prev) => (prev > 0 ? prev - 1 : 0))}
             disabled={currentQuestionIndex === 0}
             className={`px-6 py-3 rounded-full font-medium transition ${
               currentQuestionIndex === 0
@@ -206,11 +203,9 @@ export default function InterviewPage() {
           </button>
 
           <button
-            onClick={() =>
-              setCurrentQuestionIndex((prev) =>
-                prev < questionList.length - 1 ? prev + 1 : prev
-              )
-            }
+            onClick={() => setCurrentQuestionIndex((prev) =>
+              prev < questionList.length - 1 ? prev + 1 : prev
+            )}
             disabled={currentQuestionIndex === questionList.length - 1}
             className={`px-6 py-3 rounded-full font-medium transition ${
               currentQuestionIndex === questionList.length - 1
@@ -221,11 +216,9 @@ export default function InterviewPage() {
             Next Question
           </button>
         </div>
-
       </section>
 
-
-      {/* Video + Answering Section */}
+      {/* Video */}
       <section className="flex flex-col items-center justify-center mt-8">
         <div className="w-full max-w-[980px] h-[496px] bg-gray-300 rounded-xl relative overflow-hidden">
           <video ref={videoRef} autoPlay playsInline className="absolute w-full h-full object-cover" />
@@ -236,37 +229,48 @@ export default function InterviewPage() {
           onClick={recordAnswerChunk}
           disabled={!currentQuestion || isProcessing || loadingQuestions}
         >
-          {isProcessing
-            ? "Loading..."
-            : isAnswering
-              ? "Done"
-              : "Answer Question"}
+          {isProcessing ? "Loading..." : isAnswering ? "Done" : "Answer Question"}
         </button>
       </section>
 
-      {/* Navigation Buttons */}
-      <section className="w-full mt-16 flex justify-center">
-        <div className="flex justify-between w-full max-w-[1045px] px-8">
-          <Button
-            color="grey"
-            href="/mock-interview-2"
-            className="w-auto px-6 py-2"
-          >
-            Go Back
-          </Button>
-          <Button
-          color="black"
-          href="/mock-interview-4"
-          className={`w-auto px-6 py-2 ${
-            !hasValidAnswer ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-          }`}
-        >
-          Next
-        </Button>
+      {/* Final Navigation */}
+        <section className="w-full mt-16 flex justify-center">
+          <div className="flex justify-between w-full max-w-[1045px] px-8">
+            <Button color="grey" href="/mock-interview-2">Go Back</Button>
 
-        </div>
-      </section>
+            <button
+              onClick={() => {
+                if (!hasAnsweredAtLeastOne) return; // disable action if no answers
+                if (allAnswered) {
+                  window.location.href = "/mock-interview-4";
+                } else {
+                  setShowConfirmPopup(true);
+                }
+              }}
+              className={`w-auto px-6 py-2 rounded-lg font-medium transition ${
+                hasAnsweredAtLeastOne
+                  ? "bg-black text-white hover:bg-gray-800"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed opacity-50"
+              }`}
+              disabled={!hasAnsweredAtLeastOne}
+            >
+              Next
+            </button>
+          </div>
+        </section>
 
+
+      {/* Confirm Popup */}
+      {showConfirmPopup && (
+        <ErrorPopup
+          title="Are you sure?"
+          message="You haven't answered all the questions."
+          onClose={() => setShowConfirmPopup(false)} // 👈 "Go Back"
+          onConfirm={() => window.location.href = "/mock-interview-4"} // 👈 "Continue"
+          buttonText="Continue"
+          cancelText="Go Back"
+        />
+      )}
 
 
     </div>

@@ -37,9 +37,13 @@ For each response:
 - Prioritize constructive suggestions.
 - Use a tone that is Professional.
 - Speak as if you're giving feedback directly to the candidate
+- If they didn't answer the question just say you did not give a response
+
 
 2. **Also provide one general feedback comment at the end**, reflecting your overall impression of the candidate based on all four answers. Focus on general feedback that could improve the impression.
   - this can be longer in a consise paragraph
+  - You don't have to be nice if the responses they gave is not relavent and doesn't answer the question
+  - Your primary job is giving general feedback
 
 Return your response in **strict valid JSON** in this format:
 {
