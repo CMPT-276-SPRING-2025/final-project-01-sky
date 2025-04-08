@@ -15,6 +15,7 @@ export default function ResumeReview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingProgress, setProcessingProgress] = useState(0);
+  const [matchScore, setMatchScore] = useState(null);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -37,11 +38,30 @@ export default function ResumeReview() {
         const storedJobListing = localStorage.getItem("jobListingData");
         const storedResumeFileUrl = localStorage.getItem("resumeFileDataUrl");
         const storedResumeFileName = localStorage.getItem("resumeFileName");
+
+        console.log("storedResumeData exists:", !!storedResumeData);
+      console.log("storedJobListing exists:", !!storedJobListing);
         
         if (!storedResumeData || !storedJobListing) {
           clearInterval(progressInterval);
           throw new Error("Missing resume or job listing data. Please go back and try again.");
         }
+
+        // Try parsing the resume data and check if documentId exists
+      try {
+        const parsedResumeData = JSON.parse(storedResumeData);
+        console.log("documentId in resume data:", parsedResumeData.documentId);
+        console.log("documentId type:", typeof parsedResumeData.documentId);
+        
+        // If documentId is missing, log an error
+        if (!parsedResumeData.documentId) {
+          console.error("No documentId found in resume data!");
+        }
+      } catch (parseError) {
+        console.error("Error parsing stored resume data:", parseError);
+      }
+      
+    
         
         setJobListing(storedJobListing);
         setResumeData(JSON.parse(storedResumeData));
@@ -83,6 +103,45 @@ export default function ResumeReview() {
           setSuggestions([]);
         }
         
+        // Fetch match score from Affinda
+        // Fetch match score from Affinda
+try {
+  const parsedData = JSON.parse(storedResumeData);
+  if (parsedData && parsedData.documentId) {
+    console.log("Fetching match score with document ID:", parsedData.documentId);
+    console.log("Job listing excerpt:", storedJobListing.substring(0, 50) + "...");
+    
+    const matchScoreResponse = await fetch(
+      `/api/affinda?documentId=${encodeURIComponent(parsedData.documentId)}&jobDescription=${encodeURIComponent(storedJobListing)}`
+    );
+    
+    console.log("Match score response status:", matchScoreResponse.status);
+    
+    if (matchScoreResponse.ok) {
+      const matchScoreData = await matchScoreResponse.json();
+      console.log("Match score data:", matchScoreData);
+      
+      if (matchScoreData.success && matchScoreData.matchScore !== undefined) {
+        console.log("Setting match score to:", matchScoreData.matchScore);
+        setMatchScore(matchScoreData.matchScore);
+      } else {
+        console.error("Match score data structure unexpected:", matchScoreData);
+        setMatchScore(0); // Default to 0 if structure is not as expected
+      }
+    } else {
+      const errorText = await matchScoreResponse.text();
+      console.error("Error from match score endpoint:", errorText);
+      setMatchScore(0);
+    }
+  } else {
+    console.log("No document ID found in resume data");
+    setMatchScore(0);
+  }
+} catch (matchError) {
+  console.error("Error fetching match score:", matchError);
+  setMatchScore(0); // Default to 0 on error
+}
+        
         // Set progress to 100% when complete
         clearInterval(progressInterval);
         setProcessingProgress(100);
@@ -116,6 +175,38 @@ export default function ResumeReview() {
           </li>
         ))}
       </ul>
+    );
+  };
+
+  // Function to render match score with color coding
+  const renderMatchScore = () => {
+    if (matchScore === null) {
+      return <p className="text-gray-500">Calculating match score...</p>;
+    }
+    
+    // Convert the score to percentage for display
+    const scorePercentage = Math.round(matchScore * 100);
+    
+    // Determine color based on score
+    let scoreColor = "text-red-500"; // Default for low scores
+    if (scorePercentage >= 70) {
+      scoreColor = "text-green-500";
+    } else if (scorePercentage >= 40) {
+      scoreColor = "text-yellow-500";
+    }
+    
+    return (
+      <div className="flex items-center gap-2">
+        <div className="text-3xl font-bold md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-6xl">
+          <span className={scoreColor}>{scorePercentage}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div 
+            className={`${scoreColor.replace('text', 'bg')} h-2.5 rounded-full`} 
+            style={{ width: `${scorePercentage}%` }}
+          ></div>
+        </div>
+      </div>
     );
   };
 
@@ -197,11 +288,21 @@ export default function ResumeReview() {
                 </div>
               </div>
 
+              {/* Match Score Section - NEW */}
+              <div>
+                <h2 className="text-lg font-bold mb-2">Match Score</h2>
+                <div className="bg-white rounded-lg shadow-lg">
+                  <div className="border border-gray-200 rounded-lg p-6">
+                    {renderMatchScore()}
+                  </div>
+                </div>
+              </div>
+
               {/* Feedback Section */}
               <div>
                 <h2 className="text-lg font-bold mb-2">Feedback</h2>
                 <div className="bg-white rounded-lg shadow-lg">
-                  <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
+                  <div className="border border-gray-200 rounded-lg p-6 h-64 overflow-y-auto">
                     <p className="text-gray-600 whitespace-pre-line">
                       {feedback}
                     </p>

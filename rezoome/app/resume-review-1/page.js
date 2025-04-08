@@ -190,50 +190,61 @@ export default function ResumeReview() {
   }
   
   // Takes in the raw data JSON and returns it formatted
-  function interpretData(data) {
-    const jsonOutput = {
-      name: [
-        data?.candidateName?.parsed?.candidateNameFirst?.parsed,
-        data?.candidateName?.parsed?.candidateNameMiddle?.parsed,
-        data?.candidateName?.parsed?.candidateNameFamily?.parsed,
-      ]
-      .filter(Boolean)
-      .join(" "),
-      
-      age: data?.dateOfBirth?.parsed?.age ?? null, 
+  // Add this code to the interpretData function in resume-review-1/page.js
+// This ensures we capture and store the document ID from Affinda
 
-      education: data?.education?.map((edu) => ({
-        institution: edu.parsed?.educationOrganization?.parsed,
-        degree: edu.parsed?.educationAccreditation?.parsed,
-        major: edu.parsed?.educationMajor?.map((m) => m.parsed).join(", "),
-        date: edu.parsed?.educationDateRange?.parsed?.end?.year,
-        location: edu.parsed?.educationLocation?.parsed?.formatted,
-      })) ?? [],
-
-      workExperience: data?.workExperience?.map((job) => ({
-        jobTitle: job.parsed?.jobTitle?.parsed,
-        company: job.parsed?.workExperienceOrganization?.parsed,
-        location: job.parsed?.workExperienceLocation?.parsed?.formatted,
-        startDate: job.parsed?.workExperienceDateRange?.parsed?.start?.year,
-        endDate: job.parsed?.workExperienceDateRange?.parsed?.end?.year,
-        description: job.parsed?.jobDescription?.parsed
-      })) ?? [],
-
-      skills: data?.skill?.map((skill) => skill.parsed?.name) ?? [],
-
-      projects: data?.project?.map((proj) => ({
-        projectTitle: proj.parsed?.projectTitle?.parsed,
-        description: proj.parsed?.projectDescription?.parsed
-      })) ?? [],
-
-      acheivements: data?.achievement?.map((item) => item.parsed) ?? [],
-
-      associations: data?.association?.map(a => a.parsed || a.raw) ?? [],
-      hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
-      patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
-    };
-    return jsonOutput;
+function interpretData(data) {
+  // Store the document ID if available
+  if (data?.meta?.identifier) {
+    localStorage.setItem("resumeId", data.meta.identifier);
+    console.log("Stored resume ID:", data.meta.identifier);
   }
+  
+  const jsonOutput = {
+    // Keep your existing code here
+    _id: data?.meta?.identifier || null, // Add this line to store the ID in the resume data object
+    name: [
+      data?.candidateName?.parsed?.candidateNameFirst?.parsed,
+      data?.candidateName?.parsed?.candidateNameMiddle?.parsed,
+      data?.candidateName?.parsed?.candidateNameFamily?.parsed,
+    ]
+    .filter(Boolean)
+    .join(" "),
+    
+    age: data?.dateOfBirth?.parsed?.age ?? null, 
+
+    education: data?.education?.map((edu) => ({
+      institution: edu.parsed?.educationOrganization?.parsed,
+      degree: edu.parsed?.educationAccreditation?.parsed,
+      major: edu.parsed?.educationMajor?.map((m) => m.parsed).join(", "),
+      date: edu.parsed?.educationDateRange?.parsed?.end?.year,
+      location: edu.parsed?.educationLocation?.parsed?.formatted,
+    })) ?? [],
+
+    workExperience: data?.workExperience?.map((job) => ({
+      jobTitle: job.parsed?.jobTitle?.parsed,
+      company: job.parsed?.workExperienceOrganization?.parsed,
+      location: job.parsed?.workExperienceLocation?.parsed?.formatted,
+      startDate: job.parsed?.workExperienceDateRange?.parsed?.start?.year,
+      endDate: job.parsed?.workExperienceDateRange?.parsed?.end?.year,
+      description: job.parsed?.jobDescription?.parsed
+    })) ?? [],
+
+    skills: data?.skill?.map((skill) => skill.parsed?.name) ?? [],
+
+    projects: data?.project?.map((proj) => ({
+      projectTitle: proj.parsed?.projectTitle?.parsed,
+      description: proj.parsed?.projectDescription?.parsed
+    })) ?? [],
+
+    acheivements: data?.achievement?.map((item) => item.parsed) ?? [],
+
+    associations: data?.association?.map(a => a.parsed || a.raw) ?? [],
+    hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
+    patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
+  };
+  return jsonOutput;
+}
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">

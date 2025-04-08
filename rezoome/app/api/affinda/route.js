@@ -1,5 +1,3 @@
-
-
 // affinda api handling route
 import { NextResponse } from "next/server";
 
@@ -22,8 +20,28 @@ export async function POST(req) {
     }
 }
 
-
-
+// Enhanced GET endpoint for match score with better debugging
+export async function GET(req) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const documentId = searchParams.get('documentId');
+        const jobDescription = searchParams.get('jobDescription');
+        
+        if (!documentId || !jobDescription) {
+            return NextResponse.json({ error: "Missing documentId or jobDescription" }, { status: 400 });
+        }
+        
+        console.log("Getting match score with documentId:", documentId);
+        console.log("Job description length:", jobDescription.length);
+        
+        const result = await getMatchScore(documentId, jobDescription);
+        
+        return NextResponse.json({ success: true, matchScore: result.score, details: result.details || {} }, { status: 200 });
+    } catch (error) {
+        console.error("Error getting match score:", error);
+        return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    }
+}
 
 async function parseResumeWithAffinda(base64File) {
   const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
@@ -56,7 +74,7 @@ async function parseResumeWithAffinda(base64File) {
 }
 
 async function fetchResumeData(documentId) {
-const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
+  const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
   const apiUrl = `https://api.affinda.com/v3/documents/${documentId}`;
 
   try {
@@ -90,16 +108,79 @@ const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
   }
 }
 
+// Corrected getMatchScore function that follows Affinda API docs
+async function getMatchScore(documentId, jobDescription) {
+    const API_KEY = process.env.AFFINDA_API_KEY;
+    const apiUrl = "https://affinda.com/v3/resume_search/match";
+    
+    if (!API_KEY) {
+        console.error("API key is not set");
+        return { score: 0, error: "API key not configured" };
+    }
+    
+    try {
+        
+        const url = new URL(apiUrl);
+        
+        // Add parameters
+        url.searchParams.append('resume', documentId);
+        url.searchParams.append('job_description', jobDescription);
+        
+        console.log("Document ID:", documentId);
+        console.log("Job description length:", jobDescription.length);
+        console.log("Full request URL:", url.toString());
+        
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${API_KEY}`, // Make sure this is your actual API key
+                "Accept": "application/json"
+            }
+        });
+        
+        console.log("Response status:", response.status);
+        
+        // Get the raw response text first for debugging
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+        
+        // Parse the response if it's valid JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error("Failed to parse response as JSON:", parseError);
+            return { score: 0, error: "Invalid JSON response" };
+        }
+        
+        console.log("Parsed response data:", data);
+        
+        if (data && typeof data.score === 'number') {
+            console.log("Successfully got score:", data.score);
+            return { score: data.score, details: data.details || {} };
+        } else {
+            console.warn("Score not found in response data");
+            return { score: 0, error: "Score not found in API response" };
+        }
+    } catch (error) {
+        console.error("Error getting match score:", error);
+        return { score: 0, error: error.message };
+    }
+}
 
 export async function processFile(file){
   if (typeof window == "undefined") {
     console.log("Application is on server side");
-} else {
+  } else {
     alert("Application is on client side");
-}
+  }
   console.log("using base 64 file to send to affinda")
   let document = await parseResumeWithAffinda(file)
   let response = await fetchResumeData(document.meta.identifier)
+  
+  // Store the document ID in the response for later use
+  response.documentId = document.meta.identifier;
+  
   console.log(response)
   return response
 }
