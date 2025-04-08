@@ -13,9 +13,10 @@
     "@netlify/plugin-nextjs": "^5.10.1",
     "autoprefixer": "^10.4.21",
     "dotenv": "^16.4.7",
+    "formidable": "^3.5.2",
     "next": "^15.2.1",
     "node-fetch": "^3.3.2",
-    "openai": "^4.86.2",
+    "openai": "^4.91.1",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
