@@ -4,11 +4,15 @@ import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
 import ProgressBar from "../../components/ProgressBar";
+import ErrorPopup from "@/components/ErrorPopup"; // if not already imported
+const { validateJobPosting } = require("../../utils/validateJobPosting");
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 6000;
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+
 
   // Load previously saved job listing data on component mount
   useEffect(() => {
@@ -30,6 +34,12 @@ export default function ResumeReview() {
 
   async function handleSubmit(){
     if (!text.trim()) return;
+
+    const isValid = validateJobPosting(text);
+    if (!isValid) {
+      setShowErrorPopup(true);
+      return;
+    }
     
     setIsSubmitting(true);
     console.log("Job listing input:", text);
@@ -115,6 +125,16 @@ export default function ResumeReview() {
           </main>
         </div>
       </section>
+      {showErrorPopup && (
+        <ErrorPopup
+          title="Invalid Job Posting"
+          message="Please enter a more complete job description with responsibilities or requirements."
+          onClose={() => setShowErrorPopup(false)}
+          onConfirm={() => setShowErrorPopup(false)}
+          buttonText="Try Again"
+          cancelText="Cancel"
+        />
+      )}
     </div>
   );
 }
