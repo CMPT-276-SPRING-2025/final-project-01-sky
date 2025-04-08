@@ -38,7 +38,7 @@ export default function ResumeReview() {
   localStorage.removeItem("mockInterviewResponses");
 
   setFileUploaded(false);
-  setFileName("");
+  setFileName(file.name); 
   setIsLoading(true);
 
   // Handle file too large
@@ -215,22 +215,22 @@ function interpretData(data){
       <MockInterviewProgressBar currentStep={1} />
 
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-45">
+      <section className="bg-[var(--secondary-colour)]">
         <div className="text-center p-5">
-          <main className="flex flex-col items-center gap-8 mt-8 pb-10">
+          <main className="flex flex-col items-center gap-8 mt-8 pb-35">
             
             {/* File Upload Box */}
             <div className="w-[980px]">
               {!isLoading && !fileUploaded ? (
                 <FileUpload onFileSelect={handleFileSelect} />
               ) : isLoading ? (
-                <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
-                  <p className="text-lg font-medium text-gray-700 mb-2">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+                  <p className="text-lg font-medium text-gray-700 mb-2 ">
                     Processing {fileName}
                   </p>
                   <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2">
                     <div 
-                      className="bg-[var(--second-button-colour)] h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                      className="bg-[var(--second-button-colour)] h-2.5 rounded-full transition-all duration-300 ease-in-out " 
                       style={{ width: `${processingProgress}%` }}
                     ></div>
                   </div>
