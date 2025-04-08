@@ -81,7 +81,6 @@ export default function ResumeReview() {
         
         // Fetch the analysis results
         const response = await fetch(url);
-        
         if (!response.ok) {
           clearInterval(progressInterval);
           const errorData = await response.json();
@@ -110,9 +109,10 @@ try {
   if (parsedData && parsedData.documentId) {
     console.log("Fetching match score with document ID:", parsedData.documentId);
     console.log("Job listing excerpt:", storedJobListing.substring(0, 50) + "...");
+    let base64Job = await convertJobDescriptionToBase64(storedJobListing);
     
     const matchScoreResponse = await fetch(
-      `/api/affinda?documentId=${encodeURIComponent(parsedData.documentId)}&jobDescription=${encodeURIComponent(storedJobListing)}`
+      `/api/affinda?documentId=${encodeURIComponent(parsedData.documentId)}&jobDescription=${encodeURIComponent(base64Job)}`
     );
     
     console.log("Match score response status:", matchScoreResponse.status);
@@ -160,6 +160,23 @@ try {
 
     fetchFeedback();
   }, []);
+
+  function convertJobDescriptionToBase64(jobDescriptionString) {
+    const blob = new Blob([jobDescriptionString], { type: 'text/plain' });
+  
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        // reader.result includes the data URL prefix, we strip it
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+  
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
 
   // Format suggestions list or show placeholder if none
   const renderSuggestions = () => {

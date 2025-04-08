@@ -85,7 +85,7 @@ export default function ResumeReview() {
       
       const resumeData = rawData.data.data;
       console.log("Interpreting data");
-      const formattedData = interpretData(resumeData);
+      const formattedData = interpretData(rawData);
       console.log("Here is the formatted data:");
       console.log(formattedData);
 
@@ -193,7 +193,8 @@ export default function ResumeReview() {
   // Add this code to the interpretData function in resume-review-1/page.js
 // This ensures we capture and store the document ID from Affinda
 
-function interpretData(data) {
+function interpretData(rawData) {
+  let data = rawData.data.data
   // Store the document ID if available
   if (data?.meta?.identifier) {
     localStorage.setItem("resumeId", data.meta.identifier);
@@ -202,7 +203,7 @@ function interpretData(data) {
   
   const jsonOutput = {
     // Keep your existing code here
-    _id: data?.meta?.identifier || null, // Add this line to store the ID in the resume data object
+    documentId: rawData?.data?.documentId || null, // Add this line to store the ID in the resume data object
     name: [
       data?.candidateName?.parsed?.candidateNameFirst?.parsed,
       data?.candidateName?.parsed?.candidateNameMiddle?.parsed,

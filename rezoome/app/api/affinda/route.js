@@ -108,11 +108,74 @@ async function fetchResumeData(documentId) {
   }
 }
 
+async function uploadJobDescription(base64File) {
+    const API_KEY = process.env.AFFINDA_API_KEY;
+    const apiUrl = "https://api.affinda.com/v3/documents";
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          file: base64File,
+          collection: "cZFJhrSP",
+          wait_for_review: false
+        })
+      });
+  
+      const data = await response.json();
+      console.log("Uploaded job description:", data);
+  
+      return data;
+    } catch (error) {
+      console.error("Error uploading job description:", error);
+      return null;
+    }
+}
+
+
+async function addResumeToIndex(documentId, indexName = "Resume-Search-Demo") {
+    const API_KEY = process.env.AFFINDA_API_KEY;
+    const apiUrl = "https://api.affinda.com/v3/indexes/resumes";
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: indexName,
+          resume_identifiers: [documentId]
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error adding resume to index:", errorText);
+        throw new Error(`Failed to add resume to index: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("Resume added to index successfully:", data);
+      return data;
+    } catch (error) {
+      console.error("Error adding resume to index:", error);
+      throw error;
+    }
+  }
+  
+  
+
 // Corrected getMatchScore function that follows Affinda API docs
 async function getMatchScore(documentId, jobDescription) {
     const API_KEY = process.env.AFFINDA_API_KEY;
-    const apiUrl = "https://affinda.com/v3/resume_search/match";
-    
+    const apiUrl = "https://api.affinda.com/v3/resume_search/match";
+    console.log(documentId);
     if (!API_KEY) {
         console.error("API key is not set");
         return { score: 0, error: "API key not configured" };
@@ -121,10 +184,15 @@ async function getMatchScore(documentId, jobDescription) {
     try {
         
         const url = new URL(apiUrl);
-        
         // Add parameters
         url.searchParams.append('resume', documentId);
-        url.searchParams.append('job_description', jobDescription);
+        let jobDocument = await uploadJobDescription(jobDescription);
+        let jobIdentifier = jobDocument?.meta?.identifier;
+        console.log("job document id: ", jobIdentifier)
+        url.searchParams.append('job_description', jobIdentifier);
+        
+
+        
         
         console.log("Document ID:", documentId);
         console.log("Job description length:", jobDescription.length);
@@ -169,17 +237,20 @@ async function getMatchScore(documentId, jobDescription) {
 }
 
 export async function processFile(file){
-  if (typeof window == "undefined") {
-    console.log("Application is on server side");
-  } else {
-    alert("Application is on client side");
-  }
   console.log("using base 64 file to send to affinda")
   let document = await parseResumeWithAffinda(file)
   let response = await fetchResumeData(document.meta.identifier)
   
   // Store the document ID in the response for later use
   response.documentId = document.meta.identifier;
+
+  try {
+    await addResumeToIndex(document.meta.identifier);
+    response.indexStatus = "added";
+  } catch (error) {
+    console.error("Failed to add resume to index:", error);
+    response.indexStatus = "failed";
+  }
   
   console.log(response)
   return response
