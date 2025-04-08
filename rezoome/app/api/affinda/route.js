@@ -221,7 +221,8 @@ async function getMatchScore(documentId, jobDescription) {
         
         const url = new URL(apiUrl);
         // Add parameters
-        if(!isDocumentIndexed(documentId)){
+        let indexedBool = await isDocumentIndexed(documentId)
+        if(!indexedBool){
           await indexAffindaDocument(documentId);
         }
         
@@ -285,7 +286,6 @@ export async function processFile(file){
   response.documentId = document.meta.identifier;
 
   try {
-    await addResumeToIndex(document.meta.identifier);
     response.indexStatus = "added";
   } catch (error) {
     console.error("Failed to add resume to index:", error);
