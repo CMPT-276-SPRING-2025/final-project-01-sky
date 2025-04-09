@@ -17,9 +17,9 @@ export default function ResumeReview() {
   const [errorPopupData, setErrorPopupData] = useState(null);
 
   useEffect(() => {
+    //If data is already stored it will fill in the file
     const storedFileName = localStorage.getItem("resumeFileName");
     const storedResumeData = localStorage.getItem("mockInterviewResume");
-  
     if (storedFileName && storedResumeData) {
       setFileName(storedFileName);
       setFileUploaded(true);
@@ -29,7 +29,7 @@ export default function ResumeReview() {
   const handleFileSelect = async (file) => {
   console.log("File selected:", file);
 
-  // 🧹 Clean up previous session data except job listing
+  // Clean up previous session data except job listing
   localStorage.removeItem("resumeFileDataUrl");
   localStorage.removeItem("resumeFileName");
   localStorage.removeItem("resumeData");
@@ -52,7 +52,7 @@ export default function ResumeReview() {
     setIsLoading(false);
     return;
   }
-
+  //progress bar
   const progressInterval = setInterval(() => {
     setProcessingProgress((prev) => {
       if (prev >= 90) {
@@ -65,9 +65,11 @@ export default function ResumeReview() {
 
   try {
     const fileDataUrl = await fileToDataURL(file);
+    //stores file data
     localStorage.setItem("resumeFileDataUrl", fileDataUrl);
     localStorage.setItem("resumeFileName", file.name);
 
+    //Call upload file to handle affinda API call
     const rawData = await uploadFile(file);
     clearInterval(progressInterval);
 
@@ -77,6 +79,7 @@ export default function ResumeReview() {
 
     setProcessingProgress(100);
 
+    //Properly stores returned affinda data
     const resumeData = rawData.data.data;
     const formattedData = interpretData(resumeData);
 
@@ -84,6 +87,7 @@ export default function ResumeReview() {
       throw new Error("Invalid resume content");
     }
 
+    //stores formatted data
     localStorage.setItem("resumeData", JSON.stringify(formattedData));
     localStorage.setItem("mockInterviewResume", JSON.stringify(formattedData));
 
