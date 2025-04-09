@@ -104,7 +104,7 @@ export default function ResumeReview() {
       
       const resumeData = rawData.data.data;
       console.log("Interpreting data");
-      const formattedData = interpretData(resumeData);
+      const formattedData = interpretData(rawData);
       console.log("Here is the formatted data:");
       console.log(formattedData);
 
@@ -227,59 +227,74 @@ export default function ResumeReview() {
   }
   
   // Takes in the raw data JSON and returns it formatted
+
+  // Add this code to the interpretData function in resume-review-1/page.js
+// This ensures we capture and store the document ID from Affinda
+
+function interpretData(rawData) {
+  let data = rawData.data.data
+  // Store the document ID if available
+  if (data?.meta?.identifier) {
+    localStorage.setItem("resumeId", data.meta.identifier);
+    console.log("Stored resume ID:", data.meta.identifier);
+
    /**
    * Takes in the raw data JSON from Affinda API and returns it in a formatted structure
    * 
    * @param {Object} data - The raw resume data from Affinda
    * @returns {Object} Formatted resume data object
    */
-  function interpretData(data) {
-    const jsonOutput = {
-      name: [
-        data?.candidateName?.parsed?.candidateNameFirst?.parsed,
-        data?.candidateName?.parsed?.candidateNameMiddle?.parsed,
-        data?.candidateName?.parsed?.candidateNameFamily?.parsed,
-      ]
-      .filter(Boolean)
-      .join(" "),
-      
-      age: data?.dateOfBirth?.parsed?.age ?? null, 
 
-      education: data?.education?.map((edu) => ({
-        institution: edu.parsed?.educationOrganization?.parsed,
-        degree: edu.parsed?.educationAccreditation?.parsed,
-        major: edu.parsed?.educationMajor?.map((m) => m.parsed).join(", "),
-        date: edu.parsed?.educationDateRange?.parsed?.end?.year,
-        location: edu.parsed?.educationLocation?.parsed?.formatted,
-      })) ?? [],
-
-      workExperience: data?.workExperience?.map((job) => ({
-        jobTitle: job.parsed?.jobTitle?.parsed,
-        company: job.parsed?.workExperienceOrganization?.parsed,
-        location: job.parsed?.workExperienceLocation?.parsed?.formatted,
-        startDate: job.parsed?.workExperienceDateRange?.parsed?.start?.year,
-        endDate: job.parsed?.workExperienceDateRange?.parsed?.end?.year,
-        description: job.parsed?.jobDescription?.parsed
-      })) ?? [],
-
-      skills: data?.skill?.map((skill) => skill.parsed?.name) ?? [],
-
-      projects: data?.project?.map((proj) => ({
-        projectTitle: proj.parsed?.projectTitle?.parsed,
-        description: proj.parsed?.projectDescription?.parsed
-      })) ?? [],
-
-      acheivements: data?.achievement?.map((item) => item.parsed) ?? [],
-
-      associations: data?.association?.map(a => a.parsed || a.raw) ?? [],
-      hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
-      patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
-    };
-    return jsonOutput;
   }
+  
+  const jsonOutput = {
+    // Keep your existing code here
+    documentId: rawData?.data?.documentId || null, // Add this line to store the ID in the resume data object
+    name: [
+      data?.candidateName?.parsed?.candidateNameFirst?.parsed,
+      data?.candidateName?.parsed?.candidateNameMiddle?.parsed,
+      data?.candidateName?.parsed?.candidateNameFamily?.parsed,
+    ]
+    .filter(Boolean)
+    .join(" "),
+    
+    age: data?.dateOfBirth?.parsed?.age ?? null, 
+
+    education: data?.education?.map((edu) => ({
+      institution: edu.parsed?.educationOrganization?.parsed,
+      degree: edu.parsed?.educationAccreditation?.parsed,
+      major: edu.parsed?.educationMajor?.map((m) => m.parsed).join(", "),
+      date: edu.parsed?.educationDateRange?.parsed?.end?.year,
+      location: edu.parsed?.educationLocation?.parsed?.formatted,
+    })) ?? [],
+
+    workExperience: data?.workExperience?.map((job) => ({
+      jobTitle: job.parsed?.jobTitle?.parsed,
+      company: job.parsed?.workExperienceOrganization?.parsed,
+      location: job.parsed?.workExperienceLocation?.parsed?.formatted,
+      startDate: job.parsed?.workExperienceDateRange?.parsed?.start?.year,
+      endDate: job.parsed?.workExperienceDateRange?.parsed?.end?.year,
+      description: job.parsed?.jobDescription?.parsed
+    })) ?? [],
+
+    skills: data?.skill?.map((skill) => skill.parsed?.name) ?? [],
+
+    projects: data?.project?.map((proj) => ({
+      projectTitle: proj.parsed?.projectTitle?.parsed,
+      description: proj.parsed?.projectDescription?.parsed
+    })) ?? [],
+
+    acheivements: data?.achievement?.map((item) => item.parsed) ?? [],
+
+    associations: data?.association?.map(a => a.parsed || a.raw) ?? [],
+    hobbies: data?.hobby?.map(h => h.parsed || h.raw) ?? [],
+    patents: data?.patent?.map(p => p.parsed || p.raw) ?? []
+  };
+  return jsonOutput;
+}
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
+    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
       <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
@@ -291,15 +306,15 @@ export default function ResumeReview() {
       <ProgressBar currentStep={1} />
 
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-120">
-        <div className="text-center p-5">
-          <main className="flex flex-col items-center gap-8 mt-8 pb-10 ">
+      <section className="bg-[var(--secondary-colour)] pb-45 ">
+        <div className="text-center p-5 ">
+          <main className="flex flex-col items-center gap-8 mt-8 pb-10 bg-[var(--secondary-colour)]">
             <div className="w-[980px]">
               {!isLoading && !fileUploaded ? (
                 <FileUpload onFileSelect={handleFileSelect} />
               ) : isLoading ? (
-                <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
-                  <p className="text-lg font-medium text-gray-700 mb-2">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+                  <p className="text-lg font-medium text-gray-700">
                     Processing {fileName}
                   </p>
                   <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2">
@@ -315,7 +330,7 @@ export default function ResumeReview() {
                   </p>
                 </div>
               ) : (
-                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full ">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="bg-[var(--second-button-colour)] p-3 rounded-lg mr-4">

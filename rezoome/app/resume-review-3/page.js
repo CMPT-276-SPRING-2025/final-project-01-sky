@@ -15,6 +15,7 @@ export default function ResumeReview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingProgress, setProcessingProgress] = useState(0);
+  const [matchScore, setMatchScore] = useState(null);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -37,10 +38,27 @@ export default function ResumeReview() {
         const storedJobListing = localStorage.getItem("jobListingData");
         const storedResumeFileUrl = localStorage.getItem("resumeFileDataUrl");
         const storedResumeFileName = localStorage.getItem("resumeFileName");
+
+        console.log("storedResumeData exists:", !!storedResumeData);
+        console.log("storedJobListing exists:", !!storedJobListing);
         
         if (!storedResumeData || !storedJobListing) {
           clearInterval(progressInterval);
           throw new Error("Missing resume or job listing data. Please go back and try again.");
+        }
+
+        // Try parsing the resume data and check if documentId exists
+        try {
+          const parsedResumeData = JSON.parse(storedResumeData);
+          console.log("documentId in resume data:", parsedResumeData.documentId);
+          console.log("documentId type:", typeof parsedResumeData.documentId);
+          
+          // If documentId is missing, log an error
+          if (!parsedResumeData.documentId) {
+            console.error("No documentId found in resume data!");
+          }
+        } catch (parseError) {
+          console.error("Error parsing stored resume data:", parseError);
         }
         
         setJobListing(storedJobListing);
@@ -61,7 +79,6 @@ export default function ResumeReview() {
         
         // Fetch the analysis results
         const response = await fetch(url);
-        
         if (!response.ok) {
           clearInterval(progressInterval);
           const errorData = await response.json();
@@ -83,6 +100,45 @@ export default function ResumeReview() {
           setSuggestions([]);
         }
         
+        // Fetch match score from Affinda
+        try {
+          const parsedData = JSON.parse(storedResumeData);
+          if (parsedData && parsedData.documentId) {
+            console.log("Fetching match score with document ID:", parsedData.documentId);
+            console.log("Job listing excerpt:", storedJobListing.substring(0, 50) + "...");
+            let base64Job = await convertJobDescriptionToBase64(storedJobListing);
+            
+            const matchScoreResponse = await fetch(
+              `/api/affinda?documentId=${encodeURIComponent(parsedData.documentId)}&jobDescription=${encodeURIComponent(base64Job)}`
+            );
+            
+            console.log("Match score response status:", matchScoreResponse.status);
+            
+            if (matchScoreResponse.ok) {
+              const matchScoreData = await matchScoreResponse.json();
+              console.log("Match score data:", matchScoreData);
+              
+              if (matchScoreData.success && matchScoreData.matchScore !== undefined) {
+                console.log("Setting match score to:", matchScoreData.matchScore);
+                setMatchScore(matchScoreData.matchScore);
+              } else {
+                console.error("Match score data structure unexpected:", matchScoreData);
+                setMatchScore(0); // Default to 0 if structure is not as expected
+              }
+            } else {
+              const errorText = await matchScoreResponse.text();
+              console.error("Error from match score endpoint:", errorText);
+              setMatchScore(0);
+            }
+          } else {
+            console.log("No document ID found in resume data");
+            setMatchScore(0);
+          }
+        } catch (matchError) {
+          console.error("Error fetching match score:", matchError);
+          setMatchScore(0); // Default to 0 on error
+        }
+        
         // Set progress to 100% when complete
         clearInterval(progressInterval);
         setProcessingProgress(100);
@@ -102,6 +158,23 @@ export default function ResumeReview() {
     fetchFeedback();
   }, []);
 
+  function convertJobDescriptionToBase64(jobDescriptionString) {
+    const blob = new Blob([jobDescriptionString], { type: 'text/plain' });
+  
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        // reader.result includes the data URL prefix, we strip it
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+  
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
   // Format suggestions list or show placeholder if none
   const renderSuggestions = () => {
     if (!suggestions || suggestions.length === 0) {
@@ -116,6 +189,38 @@ export default function ResumeReview() {
           </li>
         ))}
       </ul>
+    );
+  };
+
+  // Function to render match score with color coding
+  const renderMatchScore = () => {
+    if (matchScore === null) {
+      return <p className="text-gray-500">Calculating match score...</p>;
+    }
+    
+    // Convert the score to percentage for display
+    const scorePercentage = Math.round(matchScore * 100);
+    
+    // Determine color based on score
+    let scoreColor = "text-red-500"; // Default for low scores
+    if (scorePercentage >= 70) {
+      scoreColor = "text-green-500";
+    } else if (scorePercentage >= 40) {
+      scoreColor = "text-yellow-500";
+    }
+    
+    return (
+      <div className="flex items-center gap-2">
+        <div className="text-3xl font-bold md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-6xl">
+          <span className={scoreColor}>{scorePercentage}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div 
+            className={`${scoreColor.replace('text', 'bg')} h-2.5 rounded-full`} 
+            style={{ width: `${scorePercentage}%` }}
+          ></div>
+        </div>
+      </div>
     );
   };
 
@@ -139,7 +244,7 @@ export default function ResumeReview() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
-      <div className="text-center pt-20 pb-5">
+      <div className="text-center pt-25 pb-5">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
         <p className="text-[var(--text-colour)] text-2xl mt-4 max-w-screen-lg mx-auto px-4">
           Review the provided feedback and suggestions to improve your resume for your targeted job.
@@ -148,9 +253,9 @@ export default function ResumeReview() {
 
       <ProgressBar currentStep={3} />
 
-      <section className="bg-[var(--secondary-colour)] pb-75 pt-10">
+      <section className="bg-[var(--secondary-colour)] pb-20 pt-10">
         {loading ? (
-          <div className="max-w-5xl mx-auto px-8 py-5 pb-100">
+          <div className="max-w-5xl mx-auto px-8 py-5">
             <div className="bg-white border-1 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
               <p className="text-lg font-medium text-gray-700 mb-2">
                 Analyzing your resume against the job listing...
@@ -174,9 +279,9 @@ export default function ResumeReview() {
             <p className="mt-2">Please go back and try again.</p>
           </div>
         ) : (
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 px-8">
-            {/* Left column - Resume and Job Posting */}
-            <div className="flex flex-col gap-6">
+          <div className="max-w-5xl mx-auto flex flex-col gap-6 pb-8 px-8">
+            {/* First Row - Resume Download and Job Posting */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Resume Download Section */}
               <div>
                 <h2 className="text-lg font-bold mb-2">Your Resume</h2>
@@ -197,22 +302,6 @@ export default function ResumeReview() {
                 </div>
               </div>
 
-              {/* Feedback Section */}
-              <div>
-                <h2 className="text-lg font-bold mb-2">Feedback</h2>
-                <div className="bg-white rounded-lg shadow-lg">
-                  <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
-                    <p className="text-gray-600 whitespace-pre-line">
-                      {feedback}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right column - Feedback & Suggestions */}
-            <div className="flex flex-col gap-6">
-
               {/* Job Posting Section */}
               <div>
                 <h2 className="text-lg font-bold mb-2">Job Posting</h2>
@@ -224,15 +313,36 @@ export default function ResumeReview() {
                   </div>
                 </div>
               </div>
-              
+            </div>
 
-              {/* Suggestions Section */}
-              <div>
-                <h2 className="text-lg font-bold mb-2">Suggestions</h2>
-                <div className="bg-white rounded-lg shadow-lg">
-                  <div className="border border-gray-200 rounded-lg p-6 h-96 overflow-y-auto">
-                    {renderSuggestions()}
-                  </div>
+            {/* Second Row - Match Score */}
+            <div>
+              <h2 className="text-lg font-bold mb-2">Match Score</h2>
+              <div className="bg-white rounded-lg shadow-lg">
+                <div className="border border-gray-200 rounded-lg p-6">
+                  {renderMatchScore()}
+                </div>
+              </div>
+            </div>
+
+            {/* Third Row - Feedback */}
+            <div>
+              <h2 className="text-lg font-bold mb-2">Feedback</h2>
+              <div className="bg-white rounded-lg shadow-lg">
+                <div className="border border-gray-200 rounded-lg p-6 max-h-64 overflow-y-auto">
+                  <p className="text-gray-600 whitespace-pre-line">
+                    {feedback}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Fourth Row - Suggestions */}
+            <div>
+              <h2 className="text-lg font-bold mb-2">Suggestions</h2>
+              <div className="bg-white rounded-lg shadow-lg">
+                <div className="border border-gray-200 rounded-lg p-6 max-h-64 overflow-y-auto">
+                  {renderSuggestions()}
                 </div>
               </div>
             </div>

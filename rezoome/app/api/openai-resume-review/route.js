@@ -9,7 +9,7 @@ const openai = new OpenAI({
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log("Received resume data:", body);
+    //console.log("Received resume data:", body);
     // Store in session storage or another persistence layer if needed
     return NextResponse.json({ message: 'Resume data received successfully', data: body });
   } catch (error) {
@@ -131,7 +131,7 @@ export async function GET(req) {
       }
     } catch (e) {
       console.error("Failed to parse OpenAI response as JSON:", e);
-      console.log("Raw response:", responseText);
+      //console.log("Raw response:", responseText);
       
       // Create a fallback response with default suggestions
       responseData = {
