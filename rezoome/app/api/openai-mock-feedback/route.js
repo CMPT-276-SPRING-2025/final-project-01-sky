@@ -1,18 +1,21 @@
 import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
+// Initialize OpenAI client using the API key from environment variables
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-console.log("✅ API route /api/openai-mock-feedback hit!");
+console.log("API route /api/openai-mock-feedback hit!");
 
+// Handle POST requests to generate mock interview feedback using OpenAI
 export async function POST(req) {
   try {
+    // Parse the incoming JSON request body
     const body = await req.json();
     const responses = body.responses;
 
-    // Validate input
+    // Validate input: must be an array of exactly 4 responses
     if (!Array.isArray(responses) || responses.length !== 4) {
       return NextResponse.json(
         { error: "Invalid input. Must provide exactly 4 responses." },
@@ -20,7 +23,7 @@ export async function POST(req) {
       );
     }
 
-    // Prompt to OpenAI (unchanged)
+    // Construct the prompt to be sent to OpenAI
     const prompt = `
 
 You are an expert career coach and technical recruiter with deep insight into what employers look for during interviews.
@@ -60,7 +63,7 @@ Q2: ${responses[1]}
 Q3: ${responses[2]}
 Q4: ${responses[3]}
     `.trim();
-
+// Make a chat completion request to OpenAI with GPT-4o
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -74,7 +77,7 @@ Q4: ${responses[3]}
           content: prompt,
         },
       ],
-      response_format: { type: "json_object" },
+      response_format: { type: "json_object" }, // Request response in JSON format
       temperature: 0.5,
     });
 
@@ -88,10 +91,11 @@ Q4: ${responses[3]}
       q4: result.q4 || "No feedback.",
       generalFeedback: result.generalFeedback || "No general feedback available.",
     };
-
+// Return the structured feedback to the client
     return NextResponse.json({ feedback: structured });
 
   } catch (err) {
+    // Handle unexpected errors and log for debugging
     console.error("Mock interview feedback error:", err);
     return NextResponse.json(
       { error: "Failed to generate feedback." },
