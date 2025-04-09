@@ -14,6 +14,7 @@ export default function ResumeReview() {
   const [showErrorPopup, setShowErrorPopup] = useState(false); 
 
   useEffect(() => {
+    //checks if listing is already saved and fills it in if it is
     const savedListing = localStorage.getItem("jobListingData");
     if (savedListing) {
       setText(savedListing);
