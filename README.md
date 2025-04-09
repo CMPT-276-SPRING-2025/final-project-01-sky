@@ -79,15 +79,15 @@ Then open your browser and go to:
 ### **6. Run Tests (Optional)**  
 To run Jest tests:  
 ```bash
-npm run test
+npm test
 ```
 
 
 
 ## 🔗 Project Links  
 - **Live Website**: https://rezoome.netlify.app/
-- **Demo Video**: [Insert Link Here]  
-- **Final Report**: [Insert Link Here]  
+- **Demo Video**: [Introducing ReZoomé](https://www.youtube.com/watch?v=tNU9Gm32i-0)  
+- **Video Presentation**: [ReZoomé Video Presentation](https://youtu.be/5YBn54XooJI?si=b6M-qmC5hopdzfZN)
 - **GitHub Repository**: [GitHub Repository](https://github.com/CMPT-276-SPRING-2025/final-project-01-sky)
 - **Prototypes and Diagrams**: [CMPT 276 Group 1 - SKY Figma](https://www.figma.com/design/VvECWTu0Tr8u44wViVJaje/CMPT-276?node-id=0-1&t=eDInWjNuRpVoYhDD-1)
 

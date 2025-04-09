@@ -9,41 +9,60 @@ import Button from "@/components/Button";
 import { isValidResume } from '../../utils/isResume';
 import ErrorPopup from "@/components/ErrorPopup";
 
-
-
+/**
+ * ResumeReview Component - Handles the first step of the resume review process
+ * This component manages the file upload functionality, processes the resume,
+ * and validates the extracted data before proceeding to the next step.
+ * 
+ * @returns {JSX.Element} The resume review upload page UI
+ */
 export default function ResumeReview() {
   const steps = ['Upload Resume', 'Add Job', 'View Results'];
-  const [currentStep, setCurrentStep] = useState(0);
-  const [fileUploaded, setFileUploaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [processingProgress, setProcessingProgress] = useState(0);
-  const [fileName, setFileName] = useState("");
-  const [errorPopupData, setErrorPopupData] = useState(null);
 
+    // State management
+  const [currentStep, setCurrentStep] = useState(0); // track current step in progress
+  const [fileUploaded, setFileUploaded] = useState(false); // track if a file has been successfully uploaded
+  const [isLoading, setIsLoading] = useState(false); // track loading state
+  const [processingProgress, setProcessingProgress] = useState(0); // track progress
+  const [fileName, setFileName] = useState(""); // store the name of uploaded
+  const [errorPopupData, setErrorPopupData] = useState(null); // store error data for display in popup
 
+ /**
+   * Effect hook to check localStorage on component mount
+   * Restores previous state if a resume was previously uploaded
+   */
 
   // Check localStorage on component mount to restore previous state
   useEffect(() => {
     const storedFileName = localStorage.getItem("resumeFileName");
     const storedResumeData = localStorage.getItem("resumeData");
-    
+
+    // If both filename and data exist in storage, restore the uploaded state
     if (storedFileName && storedResumeData) {
       setFileName(storedFileName);
       setFileUploaded(true);
     }
   }, []);
 
+  /**
+   * Handles file selection and processing
+   * 
+   * @param {File} file - The file object selected by the user
+   * @returns {Promise<void>}
+   */
   const handleFileSelect = async (file) => {
     console.log("File selected:", file);
     // Check if file is larger than 5MB
     // Check if file is too large (>5MB)
     if (file.size > 5 * 1024 * 1024) {
+      // reset state and clear local storage
       setFileUploaded(false);
       setFileName("");
       localStorage.removeItem("resumeFileDataUrl");
       localStorage.removeItem("resumeFileName");
       localStorage.removeItem("resumeData");
 
+      // show error popup with file size info
       setErrorPopupData({
         title: "File size exceeds limit",
         message: "The maximum file size allowed is 5 MB. Please compress your file or upload a smaller version.",
@@ -54,7 +73,7 @@ export default function ResumeReview() {
       return; // stop execution
     }
 
-
+// set file name and loading state
     setFileName(file.name);
     setIsLoading(true);
     
@@ -147,6 +166,12 @@ export default function ResumeReview() {
   };
 
   // Function to convert file to data URL for storage
+  /**
+   * Converts a file to a data URL for storage
+   * 
+   * @param {File} file - The file to convert
+   * @returns {Promise<string>} A promise that resolves with the data URL
+   */
   function fileToDataURL(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -156,11 +181,17 @@ export default function ResumeReview() {
     });
   }
 
+  /**
+   * Uploads a file to the Affinda API for resume parsing
+   * 
+   * @param {File} file - The resume file to upload
+   * @returns {Promise<Object>} A promise that resolves with the API response
+   */
   async function uploadFile(file) {
     try {
       const base64File = await fileToBase64(file); // Convert file to Base64
 
-      const response = await fetch("/api/affinda", { // ✅ Call the API route
+      const response = await fetch("/api/affinda", { // Call the API route
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ file: base64File }),
@@ -180,6 +211,12 @@ export default function ResumeReview() {
   }
 
   // Utility function to convert file to Base64
+  /**
+   * Utility function to convert file to Base64 encoding
+   * 
+   * @param {File} file - The file to convert
+   * @returns {Promise<string>} A promise that resolves with the base64 string
+   */
   function fileToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -190,6 +227,7 @@ export default function ResumeReview() {
   }
   
   // Takes in the raw data JSON and returns it formatted
+
   // Add this code to the interpretData function in resume-review-1/page.js
 // This ensures we capture and store the document ID from Affinda
 
@@ -199,6 +237,14 @@ function interpretData(rawData) {
   if (data?.meta?.identifier) {
     localStorage.setItem("resumeId", data.meta.identifier);
     console.log("Stored resume ID:", data.meta.identifier);
+
+   /**
+   * Takes in the raw data JSON from Affinda API and returns it in a formatted structure
+   * 
+   * @param {Object} data - The raw resume data from Affinda
+   * @returns {Object} Formatted resume data object
+   */
+
   }
   
   const jsonOutput = {

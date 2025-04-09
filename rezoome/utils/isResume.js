@@ -1,36 +1,31 @@
-
 function isValidResume(resume) {
-    // this makes sure a name exist and isnt an empty string
-    if (
-        // if the resume is missing (meaning it is null or undefined)
-      !resume ||
-      // if its not ab object (say if its a string or number)
-      typeof resume !== "object" ||
-      // if the name is missing or not a string
-      typeof resume.name !== "string" ||
-      // if the name is just whitespace or empty
-      !resume.name.trim()
-    ) {
-      return false;
-    }
-  
-    // normalize data so it doesn't crash if fields are missing or invalid, makes sure they are treated as arrays
-    // if they are not arrays, it will default to empty arrays
-    const education = Array.isArray(resume.education) ? resume.education : [];
-    const workExperience = Array.isArray(resume.workExperience) ? resume.workExperience : [];
-    // skills should be an array of strings, filter out any invalid entries
-    // it will filter out "" and "   " and any other invalid entries
-    const skills = Array.isArray(resume.skills) 
-      ? resume.skills.filter(skill => typeof skill === "string" && skill.trim() !== "")
-      : [];
-  
-    // valid if there is at least one of these sections filled out with the name
-    return (
-      education.length > 0 ||
-      workExperience.length > 0 ||
-      skills.length > 0
-    );
+  // check if resume is missing, not an object, or missing a valid name
+  if (
+    !resume || // null or undefined
+    typeof resume !== "object" || // must be an object
+    typeof resume.name !== "string" || // name must be a string
+    !resume.name.trim() // name can't be empty or just whitespace
+  ) {
+    return false;
   }
-  
-  module.exports = { isValidResume };
-  
+
+  // normalize data to ensure it's safe to work with
+  // if fields are not arrays, default to empty arrays to avoid errors
+  const education = Array.isArray(resume.education) ? resume.education : [];
+  const workExperience = Array.isArray(resume.workExperience) ? resume.workExperience : [];
+
+  // skills should be an array of non-empty strings
+  const skills = Array.isArray(resume.skills)
+    ? resume.skills.filter(skill => typeof skill === "string" && skill.trim() !== "")
+    : [];
+
+  // the resume is valid if it has a name and at least one non-empty section
+  return (
+    education.length > 0 ||
+    workExperience.length > 0 ||
+    skills.length > 0
+  );
+}
+
+// export the function so it can be used for validation or tested
+module.exports = { isValidResume };

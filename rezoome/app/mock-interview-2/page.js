@@ -4,13 +4,17 @@ import Header from '../../components/Header';
 import '../globals.css';
 import Button from '@/components/Button';
 import MockInterviewProgressBar from '@/components/MockInterviewProgressBar';
+import ErrorPopup from "@/components/ErrorPopup";
+const { validateJobPosting } = require("../../utils/validateJobPosting"); 
 
 export default function ResumeReview() {
   const [text, setText] = useState(""); 
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 6000;
+  const [showErrorPopup, setShowErrorPopup] = useState(false); 
 
   useEffect(() => {
+    //checks if listing is already saved and fills it in if it is
     const savedListing = localStorage.getItem("jobListingData");
     if (savedListing) {
       setText(savedListing);
@@ -25,17 +29,26 @@ export default function ResumeReview() {
     setCharCount(newText.length);
   }
 
-  async function handleSubmit(){
-    if (!text.trim()) return;
-    
-    console.log("user typed:", text);
-    
+  async function handleSubmit() {
+    const trimmedText = text.trim();
+  
+    if (!trimmedText) return;
+  
+    const isValid = validateJobPosting(trimmedText);
+    if (!isValid) {
+      setShowErrorPopup(true); // show error popup
+      return; // stop here if it's not a valid job posting
+    }
+  
     try {
-      // Save the job listing text in localStorage
-      localStorage.setItem("jobListingData", text);
-      console.log("Job listing saved to localStorage");
+      // save to localStorage
+      localStorage.setItem("jobListingData", trimmedText);
+      console.log("job listing saved to localStorage");
+  
+      // redirect to next step
+      window.location.href = "/mock-interview-3";
     } catch (error) {
-      console.error("Error saving job listing to localStorage:", error);
+      console.error("error saving job listing to localStorage:", error);
     }
   }
 
@@ -52,7 +65,7 @@ export default function ResumeReview() {
       <MockInterviewProgressBar currentStep={2} />
 
       {/* Text input section */}
-      <section className="bg-[var(--secondary-colour)] pb-55">
+      <section className="bg-[var(--secondary-colour)] pb-35">
         <div className="text-center p-5">
           <main className="flex flex-col items-center gap-8 mt-8">
             
@@ -76,11 +89,7 @@ export default function ResumeReview() {
             <div className="w-[980px] flex justify-between">
               <Button color="grey" href="/mock-interview-1">Go Back</Button>
               <button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await handleSubmit();
-                  window.location.href = "/mock-interview-3";
-                }}
+                onClick={handleSubmit}
                 className={`rounded-lg px-4 py-2 inline-block transition ${
                   text.trim()
                     ? "bg-black text-white hover:bg-[var(--second-button-colour)] cursor-pointer"
@@ -94,6 +103,16 @@ export default function ResumeReview() {
           </main>
         </div>
       </section>
+      {showErrorPopup && (
+        <ErrorPopup
+          title="Invalid Job Posting"
+          message="Please paste a real job posting that includes responsibilities, qualifications, or requirements."
+          onClose={() => setShowErrorPopup(false)}
+          onConfirm={() => setShowErrorPopup(false)}
+          buttonText="Try Again"
+          cancelText="Cancel"
+        />
+      )}
     </div>
   );
 }
