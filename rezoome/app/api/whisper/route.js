@@ -14,7 +14,7 @@ const openai = new OpenAI({
 
 export async function POST(req) {
   try {
-    console.log("📥 Whisper route hit");
+    console.log("Whisper route hit");
 
     // Parse the multipart form data
     const formData = await req.formData();
@@ -40,11 +40,11 @@ export async function POST(req) {
       response_format: "json",
     });
 
-    console.log("✅ Transcription result:", whisperResponse.text);
+    console.log("Transcription result:", whisperResponse.text);
 
     return NextResponse.json({ transcription: whisperResponse.text });
   } catch (error) {
-    console.error("❌ Whisper route error:", error);
+    console.error("Whisper route error:", error);
     return NextResponse.json({ error: "Whisper failed" }, { status: 500 });
   }
 }
