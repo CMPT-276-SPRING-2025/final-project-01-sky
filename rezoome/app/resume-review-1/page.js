@@ -248,7 +248,7 @@ function interpretData(rawData) {
 }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
+    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans pt-5">
       <Header />
       <div className="text-center pt-20 pb-5">
         <h1 className="text-5xl font-bold text-black">Resume Review</h1>
@@ -260,15 +260,15 @@ function interpretData(rawData) {
       <ProgressBar currentStep={1} />
 
       {/* Upload File Section */}
-      <section className="bg-[var(--secondary-colour)] pb-120">
-        <div className="text-center p-5">
-          <main className="flex flex-col items-center gap-8 mt-8 pb-10 ">
+      <section className="bg-[var(--secondary-colour)] pb-45 ">
+        <div className="text-center p-5 ">
+          <main className="flex flex-col items-center gap-8 mt-8 pb-10 bg-[var(--secondary-colour)]">
             <div className="w-[980px]">
               {!isLoading && !fileUploaded ? (
                 <FileUpload onFileSelect={handleFileSelect} />
               ) : isLoading ? (
-                <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
-                  <p className="text-lg font-medium text-gray-700 mb-2">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full flex flex-col items-center justify-center">
+                  <p className="text-lg font-medium text-gray-700">
                     Processing {fileName}
                   </p>
                   <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2">
@@ -284,7 +284,7 @@ function interpretData(rawData) {
                   </p>
                 </div>
               ) : (
-                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full">
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-8 w-full ">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="bg-[var(--second-button-colour)] p-3 rounded-lg mr-4">

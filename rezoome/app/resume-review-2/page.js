@@ -80,7 +80,7 @@ export default function ResumeReview() {
       <ProgressBar currentStep={2} />
 
       {/* Text input section */}
-      <section className="bg-[var(--secondary-colour)] pb-100">
+      <section className="bg-[var(--secondary-colour)] pb-45 ">
         <div className="text-center p-5">
           <main className="flex flex-col items-center gap-8 mt-8 ">
             <div className="w-[980px]">
