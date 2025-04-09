@@ -1,20 +1,20 @@
 function validateFeedbackInput(storage) {
-    try {
-      // try to parse the responses from localstorage
-      const responses = JSON.parse(storage.mockInterviewResponses);
-  
-      // check if it's an array and not empty
-      if (!Array.isArray(responses) || responses.length === 0) {
-        return false;
-      }
-  
-      // valid input
-      return true;
-    } catch (err) {
-      // invalid json or parsing failed
-      return false;
+  try {
+    // try to parse the stored responses from localStorage
+    const responses = JSON.parse(storage.mockInterviewResponses);
+
+    // check if parsed data is a non-empty array
+    if (!Array.isArray(responses) || responses.length === 0) {
+      return false; // invalid if not an array or if it's empty
     }
+
+    // valid input: parsed successfully and contains responses
+    return true;
+  } catch (err) {
+    // if JSON parsing fails or input is malformed, return false
+    return false;
   }
-  
-  module.exports = { validateFeedbackInput };
-  
+}
+
+// export the function so it can be used or tested elsewhere
+module.exports = { validateFeedbackInput };

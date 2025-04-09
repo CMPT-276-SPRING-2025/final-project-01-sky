@@ -1,51 +1,51 @@
+// import the isValidResume function used to validate resume structure and content
 const { isValidResume } = require('../utils/isResume');
 
-// education, work experience, and skills are arrays
-// name is a string
-// the function isValidResume checks if the resume is valid based on the following criteria
-
+// test suite for general isValidResume validation rules
 describe('isValidResume', () => {
-  // test returns true when there is a name and at least one section like education
+
+  // test case: returns true if resume has a name and at least one filled section like education
   it('returns true for a valid resume', () => {
     const resume = {
-      name: "John Doe", // name should be required on a resume
-      education: [{ institution: "Simon Fraser University" }], // education should be filled
-      workExperience: [],
-      skills: []
+      name: "John Doe", // valid full name
+      education: [{ institution: "Simon Fraser University" }], // at least one item in education
+      workExperience: [], // empty but allowed
+      skills: [] // empty but allowed
     };
-    expect(isValidResume(resume)).toBe(true);
+    expect(isValidResume(resume)).toBe(true); // output: valid since name and one section are provided
   });
 
-  // test returns false if there is no name or content at all 
+  // test case: returns false if all content is empty, including the name
   it('returns false if all sections are empty', () => {
     const resume = {
-      name: "", //if its missing a name
-      education: [], // if all these arrays are empty
-      workExperience: [],
-      skills: []
+      name: "", // no name provided
+      education: [], // no education entries
+      workExperience: [], // no work history
+      skills: [] // no skills listed
     };
-    expect(isValidResume(resume)).toBe(false); // returns as false
+    expect(isValidResume(resume)).toBe(false); // output: invalid because everything is empty
   });
 
-  // test returns true if there is name and skills present 
+  // test case: returns true if there is a name and at least one skill
   it('returns true if only skills are present', () => {
     const resume = {
-      name: "Jane Smith",
-      education: [],
-      workExperience: [],
-      skills: ["JavaScript"]
+      name: "Jane Smith", // valid name
+      education: [], // no education
+      workExperience: [], // no work history
+      skills: ["JavaScript"] // valid skill included
     };
-    expect(isValidResume(resume)).toBe(true);
+    expect(isValidResume(resume)).toBe(true); // output: valid since name and one section (skills) exist
   });
 
-  // test returns false if there is work exprience but no name 
+  // test case: returns false if work experience exists but name is missing
   it('returns false if no name even with experience', () => {
     const resume = {
-      name: "",
-      education: [],
-      workExperience: [{ jobTitle: "Dev" }],
-      skills: []
+      name: "", // name is required and missing here
+      education: [], // no education
+      workExperience: [{ jobTitle: "Dev" }], // some work history
+      skills: [] // no skills
     };
-    expect(isValidResume(resume)).toBe(false);
+    expect(isValidResume(resume)).toBe(false); // output: invalid due to missing name
   });
+
 });

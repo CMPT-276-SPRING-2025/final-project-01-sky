@@ -1,15 +1,18 @@
 // utils/requestMic.js
 
+// requests access to the user's microphone
 async function requestMicAccess() {
-    try {
-      // try to get mic access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      return { granted: true, stream };
-    } catch (error) {
-      // return error if permission is denied or fails
-      return { granted: false, error };
-    }
+  try {
+    // try to access the user's microphone
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // if successful, return the media stream and a granted flag
+    return { granted: true, stream };
+  } catch (error) {
+    // if access is denied or fails, return an error and set granted to false
+    return { granted: false, error };
   }
-  
-  module.exports = { requestMicAccess };
-  
+}
+
+// export the function so it can be used in components or tested
+module.exports = { requestMicAccess };
