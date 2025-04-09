@@ -25,7 +25,7 @@ export default function InterviewPage() {
 
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
-
+  //sets up video of camera
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -38,42 +38,53 @@ export default function InterviewPage() {
   }, []);
 
   useEffect(() => {
+    // attempt to retrieve stored mock interview data from localStorage
     const storedQuestions = localStorage.getItem("mockInterviewQuestions");
     const storedResponses = localStorage.getItem("mockInterviewResponses");
 
+    // if stored responses exist, parse and load them into state
     if (storedResponses) {
       setResponses(JSON.parse(storedResponses));
     }
 
+    // if stored questions exist, parse and load them into state, then stop loading
     if (storedQuestions) {
       setQuestionList(JSON.parse(storedQuestions));
       setLoadingQuestions(false);
     } else {
+    
       async function fetchQuestions() {
+        // ensure the fetch only happens once
         if (hasFetched) return;
         hasFetched = true;
 
         try {
+          // retrieve resume and job listing from localStorage
           const resume = JSON.parse(localStorage.getItem("resumeData"));
           const listing = localStorage.getItem("jobListingData");
-
+          // if either resume or listing is missing, throw an error
           if (!resume || !listing) {
             throw new Error("Missing resume or job listing in localStorage");
           }
 
+          // send a post request to the api to generate mock questions
           const response = await fetch("/api/openai-mock-interview", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ resume, listing }),
           });
 
+          // if the request fails, throw the response text as an error
           if (!response.ok) {
             const text = await response.text();
             throw new Error(`Fetch failed: ${text}`);
           }
 
+          // parse the response and convert the questions string into an array
           const data = await response.json();
           const questionsArr = data.questions.split('|').map(q => q.trim());
+
+          // update state and store the questions in localStorag
           setQuestionList(questionsArr);
           localStorage.setItem("mockInterviewQuestions", JSON.stringify(questionsArr));
           setLoadingQuestions(false);
