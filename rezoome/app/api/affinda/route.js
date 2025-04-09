@@ -56,7 +56,7 @@ async function parseResumeWithAffinda(base64File) {
           },
           body: JSON.stringify({
               file: base64File,  // Sending the Base64 file
-              collection: "DbKdQIFn", // Optional: replace with your Affinda collection ID
+              collection: "txgiAHqZ", // Optional: replace with your Affinda collection ID
               wait_for_review: false // 🔥 Ensures instant processing
           }),
       });
@@ -121,7 +121,7 @@ async function uploadJobDescription(base64File) {
         },
         body: JSON.stringify({
           file: base64File,
-          collection: "cZFJhrSP",
+          collection: "VfbNjkoz",
           wait_for_review: false
         })
       });
@@ -138,9 +138,20 @@ async function uploadJobDescription(base64File) {
 
 
 async function indexAffindaDocument(documentId) {
-  const API_KEY = process.env.AFFINDA_API_KEY; // Ensure API key is set
+  const API_KEY = process.env.AFFINDA_API_KEY;
   if (!documentId) {
     throw new Error('Document ID is required');
+  }
+  
+  // First check if the document is already indexed
+  try {
+    const isIndexed = await isDocumentIndexed(documentId);
+    if (isIndexed) {
+      console.log(`Document ${documentId} is already indexed, skipping indexing`);
+      return { status: 'already_indexed', documentId };
+    }
+  } catch (error) {
+    console.warn(`Error checking index status: ${error.message}. Will attempt to index anyway.`);
   }
   
   const options = {
@@ -158,11 +169,22 @@ async function indexAffindaDocument(documentId) {
     
     if (!response.ok) {
       const errorData = await response.json();
+      // If the error is that the document is already indexed, don't treat it as an error
+      if (errorData?.errors?.some(e => e.code === "unique" && 
+          e.detail?.includes("already contains the specified document"))) {
+        console.log(`Document ${documentId} is already indexed (confirmed from error)`);
+        return { status: 'already_indexed', documentId };
+      }
       throw new Error(`Affinda API error: ${JSON.stringify(errorData)}`);
     }
     
     return await response.json();
   } catch (error) {
+    // Check if the error message indicates the document is already indexed
+    if (error.message.includes("already contains the specified document")) {
+      console.log(`Document ${documentId} is already indexed (caught from error)`);
+      return { status: 'already_indexed', documentId };
+    }
     console.error('Error indexing document:', error);
     throw error;
   }
@@ -221,9 +243,18 @@ async function getMatchScore(documentId, jobDescription) {
         
         const url = new URL(apiUrl);
         // Add parameters
-        let indexedBool = await isDocumentIndexed(documentId)
-        if(!indexedBool){
-          await indexAffindaDocument(documentId);
+        let indexStatus;
+        try {
+            let indexedBool = await isDocumentIndexed(documentId);
+            if (!indexedBool) {
+                indexStatus = await indexAffindaDocument(documentId);
+                console.log("Index status:", indexStatus);
+            } else {
+                console.log(`Document ${documentId} is already indexed`);
+            }
+        } catch (indexError) {
+            console.warn("Error with document indexing, but continuing:", indexError.message);
+            // Continue with the match score request anyway
         }
         
         url.searchParams.append('resume', documentId);
